@@ -1,0 +1,5 @@
+twopicture.c, sit.bmp, sit2.bmp, sample1をcurrent directoryに置き、
+Makefileの1行目をfile=twopictureに書き換えてから以下を実行する。
+
+$ make
+$ make s

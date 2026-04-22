@@ -1,0 +1,26 @@
+[コンパイル方法]
+gcc -std=c99 sasaoka2.c -o sasaoka2.scr -lscrnsave -lgdi32 -lopengl32
+
+[実行方法]
+sasaoka2.scr /s
+あるいはsasaoka2.scrのダブルクリック
+
+[動作の説明]
+テキストファイル(sasaoka2)を1行ずつ読み込み、
+読み取った数字を指定された座標に表示する。
+読み取るテキストファイルの形式は
+　数字（3桁までの整数）　x座標　y座標
+で、各項目の間は半角スペースで区切る。
+x,y座標は正負の数どちらでも可能である。
+テキストファイルを最後まで読み込んだ時か、項目が足りない場合、
+ファイルを読み込み直して動作を再開する。
+
+[構文定義]
+<program> ::= <statements>
+<statements> ::= <statement> | <statement> <statements>
+<statement> ::= <number> <x-coordinate> <y-coordinate>
+<number> ::= <num2> | <num1><num2> | <num1><num2><num2>
+<num1> ::= '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+<num2> ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+<x-coordinate> ::= <num1><num2>* | '-' <num1><num2>* | '0'
+<y-coordinate> ::= <num1><num2>* | '-' <num1><num2>* | '0'

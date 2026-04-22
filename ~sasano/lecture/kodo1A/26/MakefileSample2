@@ -1,0 +1,7 @@
+file=sample2
+$(file).scr: $(file).c
+	gcc -std=c99 -Wall -L../../freeglut-2.8.1-1/lib -I../../freeglut-2.8.1-1/include $(file).c -o $(file).scr -lscrnsave -lglu32  -lfreeglut -lgdi32 -lopengl32
+s:
+	$(file).scr s
+clean:
+	rm $(file).scr

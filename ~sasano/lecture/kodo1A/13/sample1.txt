@@ -1,0 +1,7 @@
+$ gcc -std=c99 sample1.c -o sample1.scr -lscrnsave -lgdi32 -lopengl32
+(これは、MSYS(MinGW用のShell)を使ってコンパイルする場合｡
+TeraTerm等でやるのはgccのライブラリやヘッダファイルの検索パスの設定が
+大変になるはず）
+
+$ sample1.scr /s
+あるいはsample1.scrのdouble clickでもよい。

@@ -1,0 +1,5 @@
+#set terminal postscript eps color
+#set output "kukei.eps"
+t(x,k) = 4/(pi*(2*k-1))*sin((2*k-1)*x)
+series(x,n) = (n>1 ? t(x,n) + series(x,n-1) : t(x,1))
+plot [-pi:pi] series(x,5)

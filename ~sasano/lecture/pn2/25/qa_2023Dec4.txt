@@ -1,0 +1,20 @@
+先週受けた質問（に関連する事項）
+
+Q. buffer overflowでsegmentation faultになる境目はどうなっているのか。
+A. OS（プロ入2の環境だとlinux）が決めている。
+補足: buffer overflowでsegmentation faultになるのは、そのbuffer
+oveflowが起こったときになる場合と、それがreturn addressを書き換え
+ることによって、後でそこへ制御が移ったときになる場合がある。さら
+に、segmentation faultになるのはbuffer overflowだけが原因ではなく、
+文字列literalの領域に書き込もうとしたときや、null pointerへアクセ
+スしようとした場合にも起こる。
+
+Q. printfの変換指定子が%cで対応する式の値がヌル文字の場合、
+何も出力されないのか。
+A. ISOには記述がなく、何も出力されないという保証はない。
+つまり、何も出力されないことを前提としてプログラムを書いてはいけない。
+
+Q. web pageのファイルのダウンロードはどうやって行うのか。
+A. ファイルへのリンクの場合、通常のブラウザだと右クリックで出てくる
+小さいwindowの中にダウンロードがある。
+

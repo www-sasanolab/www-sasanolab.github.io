@@ -1,0 +1,294 @@
+#include <windows.h>
+#include <scrnsave.h>
+#include <gl/gl.h>
+#include <stdio.h>
+
+#define ID_TIMER 32767
+#define WIDTH 256 //画像の横のピクセル数 
+#define HEIGHT 256 //画像の縦のピクセル数 
+
+void EnableOpenGL(HWND, HDC *, HGLRC *);
+void DisableOpenGL(HWND, HDC, HGLRC);
+
+void readBits (GLubyte * bits, char * fileName, int width, int height) {
+  FILE *fp;
+  unsigned char header[54];
+  unsigned char color[3];
+
+  if ((fp=fopen(fileName,"rb"))==NULL) { /* 画像データ読み込み */
+    fprintf (stderr, "file not found.\n");
+    exit(0);
+  }
+  fread(header, 1, 54, fp); /* ヘッダ54バイトを読み飛ばす */
+
+/* 画像を反転させずに読み込み */
+  for (int i=0; i<width*height; i++){ /* データをBGRをRGBの順に変えて読み込み */
+    fread(&bits[2], 1, 1, fp);
+    fread(&bits[1], 1, 1, fp);
+    fread(&bits[0], 1, 1, fp);
+    bits=bits+3;
+  }
+
+  fclose(fp);
+}
+
+void readBitsAlpha (GLubyte * bits, char * fileName, int width, int height) {
+  FILE *fp;
+  unsigned char header[54];
+  unsigned char color[3];
+
+  if ((fp=fopen(fileName,"rb"))==NULL) { /* 画像データ読み込み */
+    fprintf (stderr, "file not found.\n");
+    exit(0);
+  }
+  fread(header, 1, 54, fp); /* ヘッダ54バイトを読み飛ばす */
+
+/* 画像を反転させずに読み込み */
+  for (int i=0; i<width*height; i++){ /* データをBGRをRGBの順に変えて読み込み、alpha値を追加 */
+    bits[3]=150; // alpha値
+    fread(&bits[2], 1, 1, fp);
+    fread(&bits[1], 1, 1, fp);
+    fread(&bits[0], 1, 1, fp);
+    bits=bits+4;
+  }
+  fclose(fp);
+}
+
+void readBitsRev (GLubyte * bits, char * fileName, int width, int height) {
+  FILE *fp;
+  unsigned char header[54];
+  unsigned char color[3];
+
+  if ((fp=fopen(fileName,"rb"))==NULL) { /* 画像データ読み込み */
+    fprintf (stderr, "file not found.\n");
+    exit(0);
+  }
+  fread(header, 1, 54, fp); /* ヘッダ54バイトを読み飛ばす */
+
+
+/* 画像を反転させて読み込み */
+  bits=bits+(width*height)*3;
+  for (int i=0; i<width*height; i++){ /* データをBGRをRGBの順に変えて読み込み */
+    bits=bits-3;
+    fread(&bits[2], 1, 1, fp); 
+    fread(&bits[1], 1, 1, fp);
+    fread(&bits[0], 1, 1, fp);
+  }
+  fclose(fp);
+}
+
+void drawbackground(GLubyte *bits) {
+  glDrawPixels(1280, 1024, GL_RGB, GL_UNSIGNED_BYTE, bits);
+}
+
+void display (char * ssd, GLuint * textureID, GLubyte *bits) 
+{
+  /* ここに描画部分本体を入れる(画面更新のたびに呼ばれる) */
+
+  static int flag =0;
+  static int i=0;
+  static char direction;
+  static double locx = 0.0;
+  static double locy = 0.0;
+  static int index=0;
+
+  i=i % 100;
+  direction = ssd[i];
+  i++;
+  switch (direction) {
+  case 'U': 
+    locy+=0.3;
+    break;
+  case 'D': 
+    locy-=0.3;
+    break;
+  case 'R':
+    locx+=0.3;
+    break;
+  case 'L':
+    locx-=0.3;
+    break;
+  default: // UDRL以外の文字が含まれていたら終了
+    fprintf(stderr, "Invalid character.\n");
+    exit(0);
+  }
+
+  glClear(GL_COLOR_BUFFER_BIT);
+  drawbackground(bits);
+
+  glEnable(GL_TEXTURE_2D);
+  if (i==1) {
+    index=(index+1)%2;
+    glBindTexture(GL_TEXTURE_2D, textureID[index]);
+  }
+
+  glBegin(GL_POLYGON);
+  glTexCoord2f(0, 0); glVertex2f(locx-20.0, locy-20.0);
+  glTexCoord2f(0, 1); glVertex2f(locx-20.0, locy);
+  glTexCoord2f(1, 1); glVertex2f(locx, locy);
+  glTexCoord2f(1, 0); glVertex2f(locx, locy-20.0);
+  glEnd();
+  glDisable(GL_TEXTURE_2D);
+}
+
+LRESULT WINAPI ScreenSaverProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+  static char ssd[100];
+  static FILE *fp=NULL;
+
+  static GLubyte *bits;
+  static GLuint textureID[2];
+
+  RECT rc;
+  static int wx, wy;
+  static HDC hDC;
+  static HGLRC hRC;
+
+  switch(msg) {
+
+  case WM_CREATE:
+    EnableOpenGL(hWnd, &hDC, &hRC );
+    GetClientRect(hWnd, &rc);
+    wx = rc.right - rc.left;
+    wy = rc.bottom - rc.top;
+
+    /* ここにOpenGL関連の初期化部分を入れる(起動時，1度しか呼ばれない) */
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-50.0*wx/wy, 50.0*wx/wy, -50.0, 50.0, -5.0, 5.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glViewport(0,0,wx,wy);
+    /* ここまで */
+
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); // 透明の計算方法の設定
+    glEnable(GL_BLEND); // 透明処理をONに設定
+
+    /* スクリーンセーバ記述プログラム読み込み */
+    fp=fopen ("sample1", "r");
+    if (fp==NULL) {
+      fprintf (stderr, "ファイルオープン失敗\n");
+      exit(0);
+    }
+    for (int i=0; i<100; i++)
+      if (fscanf (fp, "%c", &ssd[i]) == EOF){ // 100文字なかったら終了
+	fprintf (stderr, "The length of the input is less than 100.\n");
+	exit(0);
+      }
+    /* ここまで */
+
+    /* bitmap画像を読み込み、textureに割り当てる */
+    if ((bits = malloc (WIDTH*HEIGHT*4))==NULL) { /*  画像読み込み用領域確保, alpha値格納分追加 */
+      fprintf (stderr, "allocation failed.\n");
+      exit(0);
+    }
+    glGenTextures (2, textureID); /* texture idを2つ作成し、配列textureIDに格納する */
+
+    /* 1つ目のtexture */    
+    glBindTexture(GL_TEXTURE_2D, textureID[0]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    readBits(bits, "sit.bmp", WIDTH, HEIGHT); /* 1つ目の画像読み込み */
+    glTexImage2D(GL_TEXTURE_2D, 0, 3, WIDTH, HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, bits); // alpha値無し
+
+    /* 2つ目のtexture */
+    glBindTexture(GL_TEXTURE_2D, textureID[1]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    readBitsAlpha(bits, "sit2.bmp", WIDTH, HEIGHT); /* 2つ目の画像読み込み */
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIDTH, HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, bits); // alpha値有り
+    /* ここまで */
+    free(bits); /* 画像用領域開放 */
+
+    /* スクリーンセーバ記述プログラム読み込み */
+    fp=fopen ("sample1", "r");
+    if (fp==NULL) {
+      fprintf (stderr, "ファイルオープン失敗\n");
+      exit(0);
+    }
+    for (int i=0; i<100; i++)
+      if (fscanf (fp, "%c", &ssd[i]) ==0){
+	fprintf (stderr, "failed\n");
+	exit(0);
+      }
+    /* ここまで */
+
+    if ((bits = malloc (1280*1024*3))==NULL) { /*  背景画像読み込み用領域確保 */
+      fprintf (stderr, "allocation failed.\n");
+      exit(0);
+    }
+    readBitsRev(bits, "skytree.bmp", 1280, 1024);
+
+    SetTimer(hWnd, ID_TIMER, 22, NULL); //タイマー設定
+    break;
+  case WM_TIMER:
+    display(ssd, textureID, bits);
+    glFlush();
+    SwapBuffers(hDC);
+    break;
+  case WM_ERASEBKGND:
+    return TRUE;
+  case WM_DESTROY:
+    KillTimer(hWnd, ID_TIMER);
+    DisableOpenGL(hWnd, hDC, hRC);
+    PostQuitMessage(0);
+    free(bits);
+    return 0;
+  default:
+    break;
+  }
+  return DefScreenSaverProc(hWnd, msg, wParam, lParam);
+}
+
+BOOL WINAPI ScreenSaverConfigureDialog(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+  return TRUE;
+}
+
+BOOL WINAPI RegisterDialogClasses(HANDLE hInst)
+{
+  return TRUE;
+}
+
+void EnableOpenGL(HWND hWnd, HDC *hDC, HGLRC *hRC)
+{
+  int format;
+  PIXELFORMATDESCRIPTOR pfd = {
+    sizeof(PIXELFORMATDESCRIPTOR),   // size of this pfd
+    1,                     // version number
+    PFD_DRAW_TO_WINDOW |   // support window
+      PFD_SUPPORT_OPENGL |   // support OpenGL
+        PFD_DOUBLEBUFFER,      // double buffered
+    PFD_TYPE_RGBA,         // RGBA type
+    24,                    // 24-bit color depth
+    0, 0, 0, 0, 0, 0,      // color bits ignored
+    0,                     // no alpha buffer
+    0,                     // shift bit ignored
+    0,                     // no accumulation buffer
+    0, 0, 0, 0,            // accum bits ignored
+    32,                    // 32-bit z-buffer
+    0,                     // no stencil buffer
+    0,                     // no auxiliary buffer
+    PFD_MAIN_PLANE,        // main layer
+    0,                     // reserved
+    0, 0, 0                // layer masks ignored
+    };
+
+  *hDC = GetDC(hWnd);
+  format = ChoosePixelFormat(*hDC, &pfd);
+  SetPixelFormat(*hDC, format, &pfd);
+
+  *hRC = wglCreateContext(*hDC);
+  wglMakeCurrent(*hDC, *hRC);
+}
+
+void DisableOpenGL(HWND hWnd, HDC hDC, HGLRC hRC)
+{
+  wglMakeCurrent(NULL, NULL);
+  wglDeleteContext(hRC);
+  ReleaseDC(hWnd, hDC);
+}

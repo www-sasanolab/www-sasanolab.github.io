@@ -1,0 +1,7 @@
+#set terminal postscript eps color
+#set output "xsquare.eps"
+set xrange [-pi:pi]
+t(x,k) = 4.0/(k**2)*(-1)**k*cos(k*x)
+series(x,n) = (n>0 ? t(x,n) + series(x,n-1) : pi**2/3)
+plot series(x,5)
+replot x**2

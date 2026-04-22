@@ -1,0 +1,4 @@
+twopicture.c, sit.bmp, sit2.bmp, sample1‚ğcurrent directory‚É’u‚¢‚ÄˆÈ‰º‚ğÀs‚·‚éB
+
+$ gcc -std=c99 twopicture.c -o twopicture.scr -lscrnsave -lgdi32 -lopengl32
+$ twopicture.scr s

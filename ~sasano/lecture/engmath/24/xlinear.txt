@@ -1,0 +1,8 @@
+#set terminal postscript eps color
+#set output "xlinear.eps"
+L=1.0
+omega(k) = k*pi/L
+set xrange [-L:L]
+t(x,k) = -2/omega(k)*(-1)**k*sin(omega(k)*x)
+series(x,n) = (n>0 ? t(x,n) + series(x,n-1) : 0)
+plot series(x,10),x

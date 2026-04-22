@@ -1,0 +1,130 @@
+1. MinGW, MSYSのインストールディレクトリを作成する。
+
+Z:にディレクトリを作成
+（例）Z:\MinGW2016
+Z:の直下である必要はないが、日本語が含まれないようにする。
+（日本語が含まれているとインストール時にエラーになる。）
+
+2. 作業用ディレクトリの作成
+
+プログラムのファイルを置くディレクトリをZ:に作成する。
+（例）Z:\kodo1A
+Z:の直下である必要はありませんが、日本語が含まれないようにしてください。
+
+3. MinGWとMSYSをインストールする。
+
+http://mingw.org/ をブラウザで開き、右上の方のdownload installerボタンを押す。
+sourceforgeのページへリンクが張られており、しばらく待つと(IEの場合）
+browser画面の一番下に、mingw-get-setup.exeを
+実行または保存を選ぶ黄色の枠が現れる。
+保存を押すと、ダウンロードの完了メッセージが出てくる。
+フォルダーを開く(P)を押すとダウンロードしたファイルを置くフォルダーが
+開かれる。
+mingw-get-setup.exeをダブルクリックして実行する。
+発行元を確認できませんでしたという画面が出るが、実行ボタンを押す。
+MinGWのライセンスの画面が現れるので、Installボタンを押す。
+Install directoryが、デフォルトではC:\MinGWになっているが、
+Cドライブに入れると次回ログインしたときに消えているので、
+Changeボタンを押し、Zドライブに変更し、Z:/MinGWなどにする。
+このとき、あらかじめZ:/MinGWのフォルダが作成してない場合、
+左下の新しいフォルダの作成ボタンを押し、フォルダ名を
+MinGWなどに変更すればよい。
+それからContinueボタンを押すとダウンロードが始まる。
+ダウンロードの表示が100%になったらContinueボタンを押す。
+するとMinGW Installation Managerのwindowが現れる。
+Package欄にあるmingw32-baseとmsys-baseの四角をクリックし、
+Mark for Installationを選択する。
+C++を使いたい人はmingw32-gcc-g++も選択する。
+それからメニューのInstallationのApply Changesを選択して
+Applyボタンを押すとMinGWとMSYSのインストールが始まる。
+インストールが終わった後でPackageの追加をしたい場合は
+MinGW Installation Managerの画面を起動して同じようにすればよい。
+Z:\MinGW\libexec\mingw-get\guimain.exe
+を実行することによりMinGW Installation Managerの画面を起動できる。
+デスクトップにもこれへのショートカットが作成される。
+
+4. MSYSの設定を行う。
+
+MSYSは、
+Z:\MinGW\msys\1.0\msys.bat
+で起動してください。
+（Z:\MinGWの部分は、自分がインストール時に指定したパスにしてください。）
+これのショートカットをデスクトップ上に置いておくと便利がよい。
+
+MSYSの起動時のディレクトリ（/z/winになっていると思います）に
+.profileという名前でファイルを作成し、その中に
+export PATH=/z/MinGW/bin:$PATH
+という一行を記述し、最後に改行を入れてください。
+（/z/MinGWの部分は、自分がインストール時に指定したパスにしてください。）
+その他、好みに応じて、
+export HOME=ディレクトリ名
+cd $HOME
+などを.profileに書いておくと、<ディレクトリ名>がホームディレクトリにな
+り、そのディレクトリでシェルを始めることができ、また、
+引数なしのcdコマンドでそのディレクトリへ移動できます。
+<ディレクトリ名>は/z/で始まる名前にしてください。
+/z/がwindowsのzドライブ（MyVolume）に対応します。
+また、好みに応じて
+alias ll='ls -lt'
+などのエイリアスを設定できます。
+.profileはMSYSの起動時に読み取られるので、既にMSYSを実行中の場合は
+MSYSを起動し直してください。
+右クリックでのファイルの新規作成ではドットで始まるファイルが作れないので、
+メモ帳等を起動し、上記一行を記述してからファイル名を付けて保存する
+ときに.profileという名前を指定するようにしてください。
+これでも.profileという名前で保存できない場合、仮の名前（たとえばa.txt）で保存
+してからMSYSを起動し、mvコマンドで以下のようにして名前を変更してください。
+$ mv a.txt .profile
+
+5. サンプルプログラム(sample1.c)とスクリーンセーバ記述サンプルプログラ
+ム(sample1)をダウンロードする。
+
+Internet Explorerでsample1をダウンロードすると、
+自動的にsample1.txtにファイル名が変わる場合がありますので、
+もし変わったらファイル名をsample1に変更してください。
+
+6. sample1.txtに記載の通り、サンプルプログラムをコンパイルし実行する。
+
+$ sample1.scr /s
+のスラッシュがあると動作しない場合があるが、その場合、スラッシュを除いて
+$ sample1.scr s
+で実行してください。
+
+（注意）
+MSYSはキーボードのタイプが速い場合、（情報は打ち込まれていますが）
+画面への文字の表示が間に合わなくなるので、少しゆっくりタイプしてください。
+
+7. インストールが失敗する（必要なファイルが一部ダウンロード
+されない）ことがまれにあります（30人に1人くらい）。
+その場合、インストールを最初からやり直してください。
+
+8. glutを使いたい場合、freeglutをダウンロードしてインストールしてくだ
+さい。
+
+http://freeglut.sourceforge.net/
+からfreeglut-2.8.1.tar.gz等をダウンロードし、
+以下のように、MSYS上でどこかのディレクトリで展開し、インストールをして
+ください。
+
+$ tar zxvf freeglut-2.8.1.tar.gz
+$ cd freeglut-2.8.1
+$ ./configure
+$ make
+$ make install
+
+それから、glutの関数を使っているC言語のファイル（sample2.cなど）を以下のような感じでコンパイルして実行して
+ください。
+$ gcc -std=c99 -L/usr/local/lib sample2.c -o sample2.scr -lscrnsave -lglu32 -lglut -lgdi32 -lopengl32
+$ ./sample2.scr s
+
+これでうまくいかない場合、以下のようにincludeのディレクトリを指定してください。
+
+$ gcc -std=c99 -L/usr/local/lib -I/usr/local/include sample2.c -o sample2.scr -lscrnsave -lglu32 -lglut -lgdi32 -lopengl32
+$ ./sample2.scr s
+
+[補足]
+スクリーンセーバのサンプルプログラムはMinGW/MSYSでコンパイルするように
+書いてあります。学情センターのlinux（yli等）ではコンパイル時にエラーに
+なります。自宅にWindowsがある場合、yli等へログインするのではなく、
+MinGW/MSYSを第一回にやったようにインストールすれば自宅で作業することが
+できます。

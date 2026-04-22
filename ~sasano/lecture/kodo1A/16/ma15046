@@ -1,0 +1,14 @@
+wait 10;
+left 10;
+shot 0;
+left 20;
+shot 2;
+right 20;
+shot 1;
+right 40;
+shot 2;
+left 10;
+shot 1;
+left 20;
+shot 2;
+wait 5;

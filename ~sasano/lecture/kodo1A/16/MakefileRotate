@@ -1,0 +1,4 @@
+rotate.scr: rotate.c
+	gcc -std=c99 rotate.c -o rotate.scr -lscrnsave -lgdi32 -lopengl32
+s:
+	rotate.scr /s

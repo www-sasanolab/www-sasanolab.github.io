@@ -1,0 +1,19 @@
+[コンパイル方法]
+gcc -std=c99 sample3.c -o sample3.scr -lscrnsave -lgdi32 -lopengl32
+
+[実行方法]
+sample3.scr /s あるいは sample3.scrのダブルクリック
+sample3というファイルに以下の構文でスクリーンセーバの動作を記述する。
+（講義用web pageにsample3の記述例が置いてある。）
+
+[スクリーンセーバ記述言語の構文]
+<Program> := <Statement>
+<Statement> := <Step> | 'Loop' <Num> <Statement> | <Block> 
+<Block> := '{' <Statements> '}'
+<Statements> := empty | <Statement><Statements>
+<Step> := 'Up'|'Down'|'Left'|'Right'|'Rotate'
+<Num> := <Digit> | <Digit><Num>
+<Digit> := 1|2|3|4|5|6|7|8|9|0
+
+[スクリーンセーバ記述言語の意味]
+省略。

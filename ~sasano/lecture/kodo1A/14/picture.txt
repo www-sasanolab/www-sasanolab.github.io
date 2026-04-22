@@ -1,0 +1,4 @@
+picture.c, sit.bmp, sample1‚ğcurrent directory‚É’u‚¢‚ÄˆÈ‰º‚ğÀs‚·‚éB
+
+$ gcc -std=c99 picture.c -o picture.scr -lscrnsave -lgdi32 -lopengl32
+$ picture.scr s

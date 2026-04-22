@@ -1,0 +1,4 @@
+ma14099.scr: ma14099.c
+	gcc -std=c99 ma14099.c -o ma14099.scr -lscrnsave -lgdi32 -lopengl32
+s:
+	ma14099.scr /s

@@ -1,0 +1,5 @@
+file=sample2
+$(file).scr: $(file).c
+	gcc -std=c99 -L/usr/local/lib -I/usr/local/include $(file).c -o $(file).scr -lscrnsave -lglu32 -lglut -lgdi32 -lopengl32 
+s:
+	$(file).scr /s

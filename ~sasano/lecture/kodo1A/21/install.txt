@@ -1,0 +1,193 @@
+0. （zoomの場合）
+- 自分のPC等がwindowsの場合、それを使えばOKです。
+- 自分のPC等がiOS、MacOS、Androidなどの場合、remote desktopアプリ等を
+  インストールしてください。
+- 自分のPC等がLinuxの場合、remode desktopのclientを何かインストールし
+  て下さい。
+- リモートデスクトップの接続先: ywi.sic.shibaura-it.ac.jp
+- 以下の説明で、Zドライブになっているのは学情センターのwindowsを使う場
+  合です。自分のPCのwindowsを使う場合は、Cドライブ等、各自の状況に
+  合わせてください。
+
+1. MinGW, MSYSのインストールディレクトリを作成する。
+
+Z:にディレクトリを作成
+（例）Z:\MinGW
+Z:の直下である必要はないが、日本語が含まれないようにする。
+（日本語が含まれているとインストール時にエラーになる。）
+
+2. 作業用ディレクトリの作成
+
+プログラムのファイルを置くディレクトリをZ:に作成する。
+（例）Z:\kodo1A
+Z:の直下である必要はありませんが、日本語が含まれないようにしてください。
+
+3. MinGWとMSYSをインストールする。
+
+https://sourceforge.net/を開き、右上の検索のところで
+mingwを入れ、
+MinGW - Minimalist GNU for Windowsを選ぶ。
+すると
+https://sourceforge.net/projects/mingw/
+に移動する。
+緑色のボタンのDownloadを押して
+mingw-get-setup.exeをdownloadし、実行する。
+MinGWのライセンスの画面が現れるので、Installボタンを押す。
+Install directoryが、デフォルトではC:\MinGWになっているが、
+Cドライブに入れると次回ログインしたときに消えているので、
+Changeボタンを押し、Zドライブに変更し、Z:\MinGWなどにする。
+このとき、あらかじめZ:\MinGWのフォルダが作成してない場合、
+左下の新しいフォルダの作成ボタンを押し、フォルダ名を
+MinGWなどに変更すればよい。
+それからContinueボタンを押すとダウンロードが始まる。
+ダウンロードの表示が100%になったらContinueボタンを押す。
+するとMinGW Installation Managerのwindowが現れる。
+Package欄にあるmingw32-base-binとmsys-base-binの四角をクリックし、
+Mark for Installationを選択する。
+C++を使いたい人はmingw32-gcc-g++-binも選択する。
+それからメニューのInstallationのApply Changesを選択して
+Applyボタンを押すとMinGWとMSYSのインストールが始まる。
+インストールが終わった後でPackageの追加をしたい場合は
+MinGW Installation Managerの画面を起動して同じようにすればよい。
+Z:\MinGW\libexec\mingw-get\guimain.exe
+を実行することによりMinGW Installation Managerの画面を起動できる。
+デスクトップにもこれへのショートカットが作成される。
+
+4. MSYSの設定を行う。
+
+MSYSは、
+Z:\MinGW\msys\1.0\msys.bat
+で起動してください。
+（Z:\MinGWの部分は、自分がインストール時に指定したパスにしてください。）
+これのショートカットをデスクトップ上に置いておくと便利がよい。
+
+MSYSの起動時のディレクトリ
+（windowsから見ると、<1. で作成したdirectory>/msys/1.0/home/<ユーザ名>）に
+.profileという名前でファイルを作成し、その中に
+
+export PATH=/z/MinGW/bin:$PATH
+
+というような一行（/z/MinGWの部分は、自分がインストール時に指定したパス）
+を記述し、最後に改行を入れてください。
+
+その他、好みに応じて、
+
+export HOME=ディレクトリ名
+cd
+
+などを.profileに書いておくと、<ディレクトリ名>がホームディレクトリにな
+り、そのディレクトリでシェルを始めることができ、また、
+引数なしのcdコマンドでそのディレクトリへ移動できます。
+<ディレクトリ名>は/z/で始まる名前にしてください。
+/z/がwindowsのzドライブ（MyVolume）に対応します。
+また、好みに応じて
+
+alias ll='ls -lt'
+
+などのエイリアスを設定できます。
+.profileはMSYSの起動時に読み取られるので、既にMSYSを実行中の場合は
+MSYSを起動し直してください。（あるいは、source .profileを実行してくだ
+さい。）
+右クリックでのファイルの新規作成ではドットで始まるファイルが作れない場
+合がありますので、その場合はメモ帳等を起動し、上記一行を記述してから
+ファイル名を付けて保存するときに.profileという名前を指定するように
+してください。
+これでも.profileという名前で保存できない場合、仮の名前（たとえばa.txt）で保存
+してからMSYSを起動し、mvコマンドで以下のようにして名前を変更してください。
+
+$ mv a.txt .profile
+
+5. サンプルプログラム(sample1.c)とスクリーンセーバ記述サンプルプログラ
+ム(sample1)をダウンロードする（作業用ディレクトリに置く）。
+Makefileもダウンロードすると便利が良い。
+
+Internet Explorerでsample1をダウンロードすると、
+自動的にsample1.txtにファイル名が変わる場合がありますので、
+もし変わったらファイル名をsample1に変更してください。
+
+6. sample1.txtに記載の通り、サンプルプログラムをコンパイルし実行する。
+
+$ sample1.scr /s
+のスラッシュがあると動作しない場合があるが、その場合、スラッシュを除いて
+$ sample1.scr s
+で実行してください。
+（Makefileを使っている場合はMakefileの中身をこのように修正してください）
+
+私のMakefileを使う場合は、
+
+$ make
+$ make s
+
+としてください。
+
+私のMakefileではmake sと打った場合に、ファイルの依存関係を見ないように
+書いてありますが、コンパイルも自動で行いたい場合は
+s:
+の行を
+s:$(file).scr
+のように書き換えてください。
+
+（注意）
+MSYSはキーボードのタイプが速い場合、（情報は打ち込まれていますが）
+画面への文字の表示が間に合わなくなるので、少しゆっくりタイプしてください。
+（学情センターのwindowsの場合。自分のPCのwindowsの場合は、この問題は
+ないと思います。）
+
+7. インストールが失敗する（必要なファイルが一部ダウンロード
+されない）ことがまれにあります（30人に1人くらい）。
+その場合、インストールを最初からやり直してください。
+
+8. GLUTを使いたい場合、FreeGLUTをダウンロードしてインストールしてくだ
+さい。
+ソースコードからのコンパイルはconfigureが失敗するので、build済みのものをdownloadして使ってください。
+まず
+http://freeglut.sourceforge.net/
+へ行き、左のメニューのDownloadを押し、
+Martin Payne's Windows binaries (MSVC and MinGW)
+のリンクをたどると
+https://www.transmissionzero.co.uk/software/freeglut-devel/
+へ来ます。
+ここのolder GLUT packages directoryのリンクを辿り、
+freeglut-MinGW-2.8.1-1.mp.zip
+をダウンロードして、Z:のどこかへ展開してください。
+それから、GLUTの関数を使っているC言語のファイル（sample2.cなど）を以下のような感じでコンパイルして実行してください。
+
+$ gcc -std=c99 -Wall -L../freeglut/lib -I../freeglut/include $(file).c -o $(file).scr -lscrnsave -lglu32  -lfreeglut -lgdi32 -lopengl32
+$ ./sample2.scr s
+
+-Lと-Iのディレクトリは、各自が展開した場所に合わせて変更してください。
+
+これをMakefileにしたものを講義用web pageにMakefileSample2という名前で置いています。
+
+Makefileのファイル名が標準と違う場合、
+$ make -f MakefileSample2
+$ make -f MakefileSample2 s
+のように、-fオプションで指定できます。
+あるいはファイル名を変更して使ってください。
+
+上記で動かなかった場合、freeglutのdirectry内の
+bin/freeglut.dllをスクリーンセーバの実行ファイルがある
+ディレクトリへコピーしてください。
+
+[補足]
+スクリーンセーバのサンプルプログラムはMinGW/MSYSでコンパイルするように
+書いてあります。学情センターのlinux（yli等）ではコンパイル時にエラーに
+なります。自宅にWindowsがある場合、yli等へログインするのではなく、
+MinGW/MSYSを第一回にやったようにインストールすれば自宅で作業することが
+できます。
+
+[補足2]
+スクリーンセーバで文字を表示したい場合、文字を画像にして表示するように
+してください。
+
+[補足3]
+OpenGLについては、https://www.opengl.org/を参照してください。
+GLUTについては、https://www.opengl.org/resources/libraries/glut/を参照してください。
+
+[補足4]
+vimを使いたいなど、追加で何かをインストールしたい場合、MinGWの
+Installation Managerを起動して入れたいものの四角を押してMark for
+Installationを選択し、Installation -> Apply Changesを実行してください。
+vimの場合は、msys-vimのbinを選べばOKです。あるいは、Installation
+Managerにない場合などは、ソースコードをどこかからdownloadしてインストー
+ルしてもOKです。

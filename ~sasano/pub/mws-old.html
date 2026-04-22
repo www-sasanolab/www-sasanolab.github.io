@@ -1,0 +1,99 @@
+<html>
+<head>
+<title>Haskell Codes for Maximum Weightsum Problems</title>
+</head>
+
+<body BGCOLOR="#EEFFEE">
+<h1>Haskell Codes for Maximum Weightsum Problems</h1>
+<ul>
+
+<li><a href="http://www.ipl.t.u-tokyo.ac.jp/~sasano/pub/mis.hs">
+the maximum independent-sublist sum problem
+</a>
+<p>
+<li><a href="http://www.ipl.t.u-tokyo.ac.jp/~sasano/pub/tdp.hs">
+the maximum two disjoint paths problem on series-parallel graphs
+</a>
+<p>
+<li><a href="http://www.ipl.t.u-tokyo.ac.jp/~sasano/pub/company.hs">
+the party planning problem, the group organizing problem,
+and the supervisor chaining problem</a>
+<p>
+Note: The definition of <b>phi2</b> in the paper is wrong (in Step 3 of Section 5.2 (p.8 and p.9)).
+The definition of <b>phi2</b> should be as follows. 
+<p>
+phi2 (a1,b1) (a2,b2) = (not (b1 and b2) and a1 and a2, <em>b2</em>)
+<p>
+The Haskell code to solve the party planning problem in this file <b>company.hs</b> 
+is written using this function <b>phi2</b>.<br>
+<b>phi2</b> can be simplified as follows. 
+<p>
+phi2 c0 c0 = c0 <br>
+phi2 c0 c1 = c1 <br>
+phi2 c0 c2 = c0 <br>
+phi2 c0 c3 = c1 <br>
+phi2 c1 c0 = c0 <br>
+phi2 c1 c1 = c1 <br>
+phi2 c1 c2 = c0 <br>
+phi2 c1 c3 = c1 <br>
+phi2 c2 c0 = c0 <br>
+phi2 c2 c1 = c1 <br>
+phi2 c2 c2 = c2 <br>
+phi2 c2 c3 = c3 <br>
+phi2 c3 c0 = c0 <br>
+phi2 c3 c1 = c1 <br>
+phi2 c3 c2 = c2 <br>
+phi2 c3 c3 = c1
+<p>
+And the property description <b> p, p' </b> of 
+the supervisor chaining problem is wrong (in Section 6.1 (p.9)).
+These should be as follows.<br>
+<pre>
+p (Leader v []) = True
+p (Leader v (t:ts)) =
+    if marked v then
+       if nm t then p (Leader v ts)
+       else marked (getLeader t) and p t and
+            ol (Leader v ts)
+       else if nm t then p (Leader v ts)
+            else p t and nm (Leader v ts)
+
+ol (Leader v []) = marked v
+ol (Leader v (t:ts)) = nm t and ol (Leader v ts)
+
+p' (Root v) = True
+p' (Join t1 t2) = if lm' t2 then
+                     if nm' t1 then p' t2
+                     else lm' t1 and p' t1 and ol' t2
+                  else if nm' t1 then p' t2
+                       else p' t1 and nm' t2
+
+ol' (Root v) = marked v
+ol' (Join t1 t2) = nm' t1 and ol' t2
+</pre>
+The properties <b>ol</b> and <b>ol'</b> means 
+<em>only leader (root) marked</em>.<br>
+The Haskell code to solve the supervisor chaining problem in this file 
+<b>company.hs</b> is obtained 
+by tupling these property descriptions <b> p', lm', nm', ol'</b>.
+
+<p>
+<li><a href="http://www.ipl.t.u-tokyo.ac.jp/~sasano/pub/mss.hs">
+the maximum segment sum problem,
+the maximum even number segment sum problem,
+and the maximum even length segment sum problem</a>
+<p>
+Note: In the paper, the definition of <b>evens</b> in the case the argument is singleton 
+ is wrong (in Section 6.3 (p.10)).
+It should be as follows. 
+<p>
+evens [x] = if marked x then even (weight x) else True
+<p>
+The Haskell code in this file <b>mss.hs</b> is obtained by using this definition.
+
+</ul>
+<hr>
+<a href="http://www.ipl.t.u-tokyo.ac.jp/~sasano/index.html">Back 
+to My Home Page.</a>
+</body>
+</html>

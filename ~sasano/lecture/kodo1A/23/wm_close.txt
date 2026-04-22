@@ -1,0 +1,20 @@
+case WM_CLOSE:
+    { //Windows Aeroが有効かどうかを判定
+      HMODULE dwm = LoadLibrary("dwmapi.dll"); //dwmapi.dllの動的ロード
+      if(dwm){
+        typedef HRESULT (WINAPI*proc_type)(BOOL*);
+        proc_type DwmIsCompositionEnabled = (proc_type)GetProcAddress(dwm, "DwmIsCompositionEnabled"); //DwmIsCompositionEnabled関数のアドレスを取得
+        if(DwmIsCompositionEnabled){
+          BOOL enable;
+          HRESULT hr = DwmIsCompositionEnabled(&enable);
+          FreeLibrary(dwm);
+          if(SUCCEEDED(hr) && enable == TRUE) //enabled == TRUEの時，DWMが有効(Windows Aeroを使用している)
+            break; //使ってたらこのWorkaroundは不要なので抜ける
+        }
+      }
+    }
+    //Workaround: Windowサイズを一度変更するとブラックアウト問題を回避できる
+    GetWindowRect(hWnd, &rc);
+    SetWindowPos(hWnd, 0, rc.left, rc.top, 1, 1, SWP_NOZORDER);
+    SetWindowPos(hWnd, 0, rc.left, rc.top, rc.right, rc.bottom, SWP_NOZORDER);
+    break;

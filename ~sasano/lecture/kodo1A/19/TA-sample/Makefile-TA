@@ -1,0 +1,5 @@
+file=TA
+$(file).scr: $(file).cpp
+	g++ -std=c++11 $(file).cpp -o $(file).scr -lscrnsave -lgdi32 -lopengl32
+s:
+	$(file).scr /s

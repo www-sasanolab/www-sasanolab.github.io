@@ -1,0 +1,33 @@
+Corrections for our PEPM 2017 paper
+
+The following points address necessary corrections and clarifications regarding the definition of "position" across the paper, particularly in relation to Algorithm 2, Algorithm 3, and Section 3.2.
+
+1. Correction to the Caption of Algorithm 2
+
+The caption for Algorithm 2 incorrectly defines the scope of the start position.
+
+Original (Incorrect): "...have the same start position in the source code."
+
+Correction (Required): "...have the same start position in the context of detecting clone pairs in Algorithm 1."
+
+Reasoning: The start position in this context refers to the index within the token sequences being compared by Algorithm 1, not the line/column numers of the source code.
+
+2. Clarification of compareAPP Output (Section 3.2)
+
+In Section 3.2, the description of the compareAPP function needs explicit clarification regarding the returned positions.
+
+Original Sentence: "When they are equal the function compareAPP returns a triple of their end positions and the start position."
+
+Clarification: The 'positions' referred to in this sentence (the end positions and the start position) must be understood as the indices within the sequences of tokens of the clone candidates being detected.
+
+3. Distinction of Operators .left and .right
+
+We should have used different names for the the operators .left and .right in different algorithms:
+
+In Algorithm 2, the operators .left and .right obtain the positions (indices) in the sequences of tokens of the clones being detected by Algorithm 1.
+
+In Algorithm 3, the operators .left and .right are used to obtain the corresponding positions in the actual source code (line and column numbers).
+
+This distinction must be maintained consistently throughout the text to prevent confusion between token indices and source code coordinates.
+
+(Correction by Isao Sasano on October 22, 2025.)
