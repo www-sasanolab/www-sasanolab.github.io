@@ -1,0 +1,74 @@
+型情報を考慮した変数名補完のためのEmacsモード 「Lambdaモード」
+
+------動作環境------
+Emacsのバージョンが22以上であること
+  (auto-complete.elの動作環境がバージョン22以上であるため)。
+
+------利用方法------
+1. 簡単に試す方法
+(1) lambda-mode.el, lambda-parse.el, auto-complete.elを同じディレクトリに置く。
+(2) Emacsを起動する。
+(3) auto-complete.elを以下のようにして読み込む。
+    M-x load-file の後にリターンキーを打つと
+      Load file: c:/Documents and Settings/goto/
+    のように表示される(Meadowの場合)。
+    そこでauto-complete.elへのパスを入力しリターンキーを打つと
+    auto-complete.elが読み込まれる。
+
+(4) lambda-parse.elを以下のようにして読み込む。
+    M-x load-file の後にリターンキーを打つと
+      Load file: c:/Documents and Settings/goto/
+    のように表示される(Meadowの場合)。
+    そこでlambda-parse.elへのパスを指定しリターンキーを打つと
+    lambda-parse.elが読み込まれる。
+
+(5) lambda-mode.elを以下のようにして読み込む。
+    M-x load-file の後にリターンキーを打つと
+      Load file: c:/Documents and Settings/goto/
+    のように表示される(Meadowの場合)。
+    そこでlambda-mode.elへのパスを指定しリターンキーを打つと
+    lambda-mode.elが読み込まれる。
+
+(5) 現在のバッファのメジャーモードを以下のようにしてlambda-modeに切り替える。
+    M-x lambda-modeと入力しリターンキーを押す。
+    これでメジャーモードがlambda-modeに切り替わる。
+
+(6) 現在のバッファにおいて、以下のようにしてマイナーモードauto-complete-modeを有効する。
+    M-x auto-complete-modeと入力しリターンキーを押す。
+    これでマイナーモードauto-complete-modeが有効になる。
+
+ 
+
+2. 一般的なインストール方法
+lambda-mode.elとlambda-parse.elをlaod-pathの通ったディレクトリに置き、
+.emacs等に以下のコードを書く。
+
+(require 'lambda-mode)
+(add-to-list 'ac-modes 'lambda-mode)	
+
+またauto-complete.elも必要です。
+auto-complete.elは以下で取得できます。
+    http://www.emacswiki.org/emacs/AutoComplete
+
+以上の通りlambda-mode.elとlambda-parse.el、auto-complete.elを
+インストールしたらEmacsを起動後
+    M-x lambda-mode
+と入力しリターンキーを押すと、簡易言語用の変数名補完機能付きモードになります。
+
+------作者-------
+芝浦工業大学 工学部 情報工学科
+プログラミング言語研究室 後藤 拓実
+
+------著作権-------
+本プログラムはフリーソフトです．
+プログラムの配布・転載等は、自由に行っていただいて結構です．
+
+------注意事項------
+このプログラムの実行により問題や損害が発生しても作者は一切責任をとりません。
+
+------バグ報告等の連絡先------
+後藤　拓実：l06050 AT shibaura-it DOT ac DOT jp
+あるいは
+篠埜　功：sasano AT sic DOT shibaura-it DOT ac DOT jp
+
+

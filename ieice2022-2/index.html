@@ -1,0 +1,85 @@
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<head>
+  <title>A Visual Tool for Change-Based Code Review
+  </title>
+</head>
+<body>
+
+<h1>A Visual Tool for Change-Based Code Review</h1>
+
+このページでは、2022年3月 電子情報通信学会総合大会の論文</br>
+「A Visual Tool for Change-Based Code Review」</br>
+で提示した方式を実装したプログラムのソースコード(version 0.1.1)を公開しています。</br>
+
+<h2>使い方</h2>
+<a href="./vcr_0.1.1.zip">vcr_0.1.1.zip</a>
+"をダウンロードして展開し、Readme.txtファイルに従ってインストール、実行してください。"
+
+<h2>スクリーンショット</h2>
+<img src="./code_review.png" style="width:50%">
+
+<h2>github差分表示機能と比較</h2>
+<h3>コードの移動</h3>
+
+  Fig.1 2 はgithub差分表示機能と提案手法でコードの移動を含むソースコードを比較する時です。<br>
+  github差分表示機能はコードの移動を検出することができない。<br>
+  提案ツールはコードの移動を色付けで表示している。<br>
+
+<figure>
+  <img src="g_move_line.png" style="width:65%"> 
+  <figcaption>Fig.1 github差分表示機能コードの移動スクリーンショット</figcaption>
+</figure>
+<br>
+<figure>
+  <img src="p_move_line.png" style="width:70%">
+  <figcaption>Fig.2 提案ツールコードの移動スクリーンショット</figcaption>
+</figure>
+
+
+<br>
+<hr>
+<h3>コードの変更</h3>
+
+<h3>コード変更の部分(左右揃う)場合</h3>
+  Fig.3 4 はgithub差分表示機能と提案手法でコードの変更(左右揃う場合)を含むソースコードを比較する時です。<br>
+  github差分表示機能と提案ツールはコード変更部分(左右揃う場合)、コードの変更を検出することができる。<br>
+
+
+
+<figure>
+  <img src="g_change_align.png" style="width:70%">
+  <figcaption>Fig.3 github差分表示機能コードの変更(左右揃う場合)スクリーンショット</figcaption>
+</figure>
+<figure>
+  <img src="p_change_align.png" style="width:70%">
+  <figcaption>Fig.4 提案ツールコードの変更(左右揃う場合)スクリーンショット</figcaption>
+</figure>
+
+<h3>コード変更の部分(左右揃わない)場合</h3>
+  Fig.5 6 はgithub差分表示機能と提案手法でコードの変更(左右揃わない場合)を含むソースコードを比較する時です。<br>
+  github差分表示機能はコードの変更を検出できない。<br>
+  提案ツールはコード変更部分左右揃わなくでも表示している。<br>
+
+
+
+<figure>
+  <img src="g_change_not_align.png" style="width:70%">
+  <figcaption>Fig.5 github差分表示機能コードの変更(左右揃わない場合)スクリーンショット</figcaption>
+</figure>
+<figure>
+  <img src="p_change_not_align.png" style="width:70%">
+  <figcaption>Fig.6 提案ツールコードの変更(左右揃わない場合)スクリーンショット</figcaption>
+</figure>
+
+<hr>
+<h2>更新履歴</h2>
+<ul>
+  <li>
+    2022年2月22日 version 0.1.1を公開
+    <div>バッグの修正</div>
+  </li>
+  <li>
+    2021年12月18日 version 0.1.0を公開
+  </li>
+</ul>

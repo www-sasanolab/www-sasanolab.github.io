@@ -1,0 +1,125 @@
+<html lang="ja">
+<head>
+  <meta charset="utf-8"/>
+  <script src="https://cdn.jsdelivr.net/npm/blockly@1.0.0/blockly_compressed.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/blockly@1.0.0/blocks_compressed.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/blockly@1.0.0/python_compressed.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/blockly@1.0.0/msg/js/ja.min.js"></script>
+  <script src="defineBlocks.js"></script>
+
+  <link rel="stylesheet" href="https://pyscript.net/snapshots/2023.05.1.RC1/pyscript.css"/>
+  <script defer src="https://pyscript.net/snapshots/2023.05.1.RC1/pyscript.js"></script>
+  
+  <title>Python Block Programming</title>
+</head>
+<body>
+  <a href="index.html" style="font-size: x-large; margin: 10px;" target="_blank"><button>CreateNew</button></a>
+  <button onclick="RunCode();" style="font-size: x-large; margin: 10px;">Run</button> 
+  <button onclick="SavePython();" style="font-size: x-large; margin: 10px;">SavePython</button> 
+  <button onclick="SaveBlock();" style="font-size: x-large; margin: 10px;">SaveBlock</button>
+  <button onclick="Submit();" style="font-size: x-large; margin: 10px;">CopyToSubmit</button> 
+  <input name="inputFile" type="file" id="file">
+  <div id="result" style="font-size: x-large; margin: 10px;"></div>
+  <div id="content" style="display:flex; height:95%; width: 98%;">
+    <div id="blocklyDiv" style="height: 100%; width: 100%;"></div>
+    <div id="codeSpace" style="display: none;"></div>
+  </div>
+  <py-config>terminal = false</py-config>
+
+  <xml id="toolbox" xmlns="https://developers.google.com/blockly/xml" style="display: none">
+    <category name="値">
+      <block type="getvariable"></block>
+      <block type="string"></block>
+      <block type="number"></block>
+    </category>
+    <category name="入出力">
+      <block type="print"></block>
+      <block type="print2"></block>
+      <!--<block type="assinput"></block>-->
+      <block type="assinputnum"></block>
+    </category>
+    <category name="代入，演算">
+      <block type="assignment"></block>
+      <block type="arithmetic"></block>
+      <block type="compare"></block>
+      <block type="logical"></block>
+      <block type="not"></block>
+    </category>
+    <category name="制御">
+      <block type="if"></block>
+      <block type="elif"></block>
+      <block type="else"></block>
+      <block type="for"></block>
+      <block type="while"></block>
+    </category>
+  </xml>
+
+  <script>
+    var workspace = Blockly.inject('blocklyDiv', {
+      toolbox: document.getElementById('toolbox'),
+      trashcan: true
+    });
+
+    function Update(){
+      var code = Blockly.Python.workspaceToCode(workspace);
+      document.getElementById('codeSpace').innerHTML = '<pre id="code">' + code + '</pre>';
+    }
+
+    workspace.addChangeListener(Update);
+
+    function SaveBlock() {
+      var xml = Blockly.Xml.workspaceToDom(workspace);
+      var myBlockXml = Blockly.Xml.domToText(xml);
+      if (confirm("現在のプログラムをブロック形式でファイルに書き出しますか？")) {
+        const blob = new Blob([myBlockXml],{type:"text/plain"});
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'myProgram.xml';
+        link.click();
+      }
+    }
+
+    function SavePython() {
+      if (confirm("現在のプログラムをPythonプログラムとしてファイルに書き出しますか？")) {
+        const blob = new Blob([document.getElementById('code').innerText],{type:"text/plain"});
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'myProgram.py';
+        link.click();
+      }
+    }
+
+    function Submit() {      
+      if (confirm("現在のプログラムを提出用にコピーしますか？")) {
+        const copy = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(workspace));
+        navigator.clipboard.writeText(copy).then(
+          (success) => {
+            alert("コピーしました．");
+          },
+          (error) => {
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = copy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempTextArea);
+            alert("コピーしました．");
+          },
+        );
+      }
+    }
+
+    // ファイルからブロックを復元
+    document.getElementById("file").addEventListener( 'change', function(e) {
+      var result = e.target.files[0];
+      var reader = new FileReader();
+      reader.readAsText(result);
+      reader.addEventListener('load', function() {
+      var xml = Blockly.Xml.textToDom(reader.result);
+        workspace.clear();
+        Blockly.Xml.domToWorkspace(xml, workspace);
+      })
+    })
+  </script>
+</body>
+</html>

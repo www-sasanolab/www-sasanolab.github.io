@@ -1,0 +1,40 @@
+h1 {
+    color: #70AD47;
+    text-align: center;
+}
+
+h2 {
+    margin: 0 1em;
+    padding: 0.1em 0.5em;
+    color: #ED7D31;
+    background: transparent;
+    border-left: solid 0.25em #ED7D31;
+}
+
+p {
+    padding: 0 3em;
+}
+
+.header {
+    text-align: center;
+    padding: 0 1em;
+}
+
+ul, ol {
+    font-size: medium;
+}
+
+.top {
+    font-weight: bold;
+    padding: 0 3em 0 4.5em;
+}
+
+.inner {
+    font-weight: normal;
+    padding: 0.25em 0 1em 2em;
+}
+
+.innerinner {
+    font-weight: normal;
+    padding: 0 0 0 2em;
+}

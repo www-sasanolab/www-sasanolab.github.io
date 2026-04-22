@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Transforming addresses to latitudes and longitudes by using ArcGIS service provided by ESRI</title>
+<meta charset="utf-8" />
+</head>
+
+<body>
+<script>
+function displayLatLon(array)
+{
+  var out = "<br/>";
+  var i;
+  if(array.length > 0) {
+    i=0;
+    out += "addr = " + array[i].name + "</br>";
+    out += "latitude = " + array[i].feature.geometry.y + "</br>";
+    out += "longitude = " + array[i].feature.geometry.x + "</br>";
+    document.getElementById('results').innerHTML = out;
+  } else {
+    document.getElementById('results').innerHTML = "Sorry, no results...";
+  }
+}
+
+function addr_search()
+{
+  var input = document.getElementById("addr");
+  var xmlhttp = new XMLHttpRequest();
+  var url = "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=json&text=" + input.value;
+  xmlhttp.onreadystatechange = function()
+  {
+    if (this.readyState == 4 && this.status == 200)
+    {
+      var parseResult = JSON.parse(this.responseText);
+      var array = parseResult.locations;
+      displayLatLon(array);
+    }
+  };
+  xmlhttp.open("GET", url, true);
+  xmlhttp.send();
+}
+</script>
+
+<div id="search">
+<input type="text" name="addr" value="" id="addr" size="58" />
+<button type="button" onclick="addr_search();">Search</button>
+<div id="results"></div>
+</div>
+
+</body>
+</html>

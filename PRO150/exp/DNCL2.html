@@ -1,0 +1,367 @@
+<html lang="ja">
+<head>
+  <meta charset="utf-8"/>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://pyscript.net/snapshots/2023.05.1.RC1/pyscript.css"/>
+  <script defer src="https://pyscript.net/snapshots/2023.05.1.RC1/pyscript.js"></script>
+
+  <title>実験用: DNCL2プログラム実行ツール</title>
+</head>
+<body>
+
+  <py-config>
+    terminal = false
+    packages = ["lark"]
+
+    [[fetch]]
+    files = ["exDNCL2.lark"]
+  </py-config>
+
+  <a href="DNCL2.html" style="font-size: x-large; margin: 10px;" target="_blank"><button>CreateNew</button></a>
+  <button onclick="RunCode();" style="font-size: x-large; margin: 10px;">Run</button> 
+  <button onclick="SaveProgram();" style="font-size: x-large; margin: 10px;">SaveProgram</button>
+  <button onclick="Submit();" style="font-size: x-large; margin: 10px;">CopyToSubmit</button> 
+  <input name="inputFile" type="file" id="file">
+  <div id="result" style="font-size: x-large; margin: 10px;"></div>
+  <div id="content" style="display:flex; height:95%; width: 98%;">
+    <textarea id="codeSpace" cols="100"></textarea>
+    <textarea id="translator1" style="display: none;">
+from lark import Lark, Transformer
+import subprocess
+
+def check_tuple(tree, length):
+    if len(tree) == length:
+        return ""
+    else:
+        return str(tree[length])
+
+class ToMyLang(Transformer):
+    def start(self, tree):
+        r = ""
+        for i in range(len(tree)):
+            r += str(tree[i])
+        return r
+
+    def ctrl(self, tree):
+        return str("\t")
+    
+    def my_number(self, tree):
+        token = tree[0]
+        return str(token)
+    
+    def pos_number(self, tree):
+        token = tree[0]
+        return "+" + str(token)
+    
+    def neg_number(self, tree):
+        token = tree[0]
+        return "-" + str(token)
+    
+    def string(self, tree):
+        token = tree[0].value
+        return str(token)
+
+    def var_name(self, tree):
+        return str(tree[0])
+    
+    def init_var(self, tree):
+        r = ""
+        for i in range(len(tree)):
+            r += str(tree[i])
+        return r
+
+    def list_elem(self, tree):
+        r = str(tree[0])
+        for i in range(1, len(tree)):
+            r = r + "[" + str(tree[i]) + "]"
+        return r
+
+    def list_name(self, tree):
+        r = ""
+        for i in range(len(tree)):
+            r += str(tree[i])
+        return r
+
+    def _fn_name(self, tree):
+        return str(tree[0].value)
+    
+    def list(self, tree):
+        r = "["
+        for i in range(len(tree)):
+            if i > 0:
+                r += ", "
+            r += str(tree[i])
+        return r + "]"
+    
+    def input(self, tree):
+        return "float(input())"
+    
+    def input_int(self, tree):
+        return "int(input())"
+    
+    def mul_assignment(self, tree):
+        r = ""
+        for i in range(len(tree)):
+            if i > 0:
+                r += "\n"
+            r += str(tree[i])
+        return r
+    
+    def def_function(self, tree):
+        return "def " + str(tree[0]) + "(" + check_tuple(tree, 1) + "):"
+    
+    def return_state(self, tree):
+        return "return " + check_tuple(tree, 0)
+    
+    def break_state(self, tree):
+        return "break"
+
+    def assignment(self, tree):
+        r = ""
+        for i in range(0, len(tree)-1):
+            if i > 0:
+                r += ", "
+            r += str(tree[i])
+        return r + " = " + str(tree[i+1])
+
+    def print(self, tree):
+        return "print(" + check_tuple(tree, 0) + ")"
+
+    def print_space(self, tree):
+        return "print(" + check_tuple(tree, 0) + ", end=' ')"
+
+    def print_no_break(self, tree):
+        return "print(" + check_tuple(tree, 0) + ", end='')"
+    
+    def init_list_zeros(self, tree):
+        return str(tree[0]) + " = [0] * len(" + str(tree[0]) + ")"
+    
+    def append(self, tree):
+        return str(tree[0]) + ".append(" + str(tree[1]) + ")"
+    
+    def s_if(self, tree):
+        return "if " + str(tree[0]) + ":"
+    
+    def s_elif(self, tree):
+        return "elif " + str(tree[0]) + ":"
+    
+    def s_else(self, tree):
+        return "else:"
+    
+    def r_for_inc(self, tree):
+        return "for " + str(tree[0]) + " in range(int(" + str(tree[1]) + "), int(" + str(tree[2]) + ")+1, int(" + str(tree[3]) + ")):"
+    
+    def r_for_dec(self, tree):
+        return "for " + str(tree[0]) + " in range(int(" + str(tree[1]) + "), int(" + str(tree[2]) + ")-1, int(" + str(tree[3]) + ")*(-1)):"
+    
+    def r_while(self, tree):
+        return "while " + str(tree[0]) + ":"
+    
+    def add(self, tree):
+        return str(tree[0]) + " + " + str(tree[1])
+    
+    def sub(self, tree):
+        return str(tree[0]) + " - " + str(tree[1])
+    
+    def mul(self, tree):
+        return str(tree[0]) + " * " + str(tree[1])
+    
+    def div(self, tree):
+        return str(tree[0]) + " / " + str(tree[1])
+    
+    def quo(self, tree):
+        return str(tree[0]) + " // " + str(tree[1])
+    
+    def mod(self, tree):
+        return str(tree[0]) + " % " + str(tree[1])
+    
+    def pow(self, tree):
+        return str(tree[0]) + " ** " + str(tree[1])
+    
+    def eq(self, tree):
+        return str(tree[0]) + " == " + str(tree[1])
+    
+    def neq(self, tree):
+        return str(tree[0]) + " != " + str(tree[1])
+    
+    def gt(self, tree):
+        return str(tree[0]) + " > " + str(tree[1])
+    
+    def mt(self, tree):
+        return str(tree[0]) + " >= " + str(tree[1])
+    
+    def lt(self, tree):
+        return str(tree[0]) + " < " + str(tree[1])
+    
+    def le(self, tree):
+        return str(tree[0]) + " <= " + str(tree[1])
+    
+    def and_e(self, tree):
+        return str(tree[0]) + " and " + str(tree[1])
+    
+    def or_e(self, tree):
+        return str(tree[0]) + " or " + str(tree[1])
+    
+    def not_e(self, tree):
+        return "not " + str(tree[0])
+    
+    def function_call(self, tree):
+        return str(tree[0]) + "(" + check_tuple(tree, 1) + ")"
+    
+    def len(self, tree):
+        return "len(" + str(tree[0]) + ")"
+    
+    def max(self, tree):
+        return "max(" + str(tree[0]) + ")"
+    
+    def min(self, tree):
+        return "min(" + str(tree[0]) + ")"
+    
+    def sum(self, tree):
+        return "sum(" + str(tree[0]) + ")"
+    
+    def trans_int(self, tree):
+        return "int(" + str(tree[0]) + ")"
+    
+    def rand_int(self, tree):
+        return "random.randint(" + str(tree[0]) + ", " + str(tree[1]) +  ")"
+    
+    def priority(self, tree):
+        return "(" + str(tree[0]) + ")"
+    
+    def tuple_e(self, tree):
+        r = ""
+        for i in range(len(tree)):
+            if i > 0:
+                r += ", "
+            r += str(tree[i])
+        return r
+
+
+parser = Lark(
+    open(r"exDNCL2.lark"),
+    parser='lalr',
+    transformer=ToMyLang()
+)
+
+python_code = "" #'import random\n'
+</textarea>
+
+    <textarea id="translator2" style="display: none;">
+
+tmp = ""
+for line in dncl2_code:
+    if line.endswith(",\n"):
+        tmp += line
+    else:
+        tmp += line
+        l = parser.parse(tmp)
+        tmp = ""
+        #display(l, target="python_code")
+        python_code = python_code + l + "\n"
+python_code = python_code.replace('None', '')
+print(python_code)
+result = Element("result")
+result.element.innerHTML = '<py-script output="result">\n' + python_code.replace('None', '') + '</py-script>'
+</textarea>
+    <div id="python_code" style="display: none;"></div>
+  </div>
+
+  <script>
+    function RunCode() {
+      var script1 = '<py-script output="python_code">\n' + document.getElementById("translator1").value;
+      var script2 = document.getElementById("translator2").value + "</py-script>";
+
+      var python_code = document.getElementById('codeSpace').value.replace(/\r\n|\r/g, "\n").replace(/,\n/g, ",").split('\n');
+      var code_list = "dncl2_code = [";
+      for (var i=0; i<python_code.length; ++i) {
+        if (i>0) code_list += ", "
+        code_list = code_list + "'" + python_code[i] + "'";
+      }
+      code_list += "]\n";
+      var program = script1 + code_list + script2;
+      document.getElementById('python_code').innerHTML = program;
+    }
+
+    function SaveProgram() {
+      if (confirm("現在のプログラムをファイルに書き出しますか？")) {
+        const blob = new Blob([document.getElementById("codeSpace").value],{type:"text/plain"});
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'myProgram.exDNCL2';
+        link.click();
+      }
+    }
+
+    function Submit() {
+      if (confirm("表示されている実行結果をコピーしますか？")) {
+        const copy = document.getElementById("result").innerText;
+        navigator.clipboard.writeText(copy).then(
+          (success) => {
+            alert("コピーしました．");
+          },
+          (error) => {
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = copy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempTextArea);
+            alert("コピーしました．");
+          },
+        );
+      }
+    }
+
+    // ファイル読み込み
+    document.getElementById("file").addEventListener( 'change', function(e) {
+      var result = e.target.files[0];
+      var reader = new FileReader();
+      reader.readAsText(result);
+      reader.addEventListener('load', function() {
+        document.getElementById('codeSpace').value = reader.result;
+      })
+    })
+
+    // 特殊記号の入力支援
+    document.addEventListener('keydown', () => {
+        if (event.keyCode == 9) {
+            event.preventDefault();
+
+            var textarea = document.getElementById('codeSpace');
+            var sentence = textarea.value;
+            var len      = sentence.length;
+            var pos      = textarea.selectionStart;
+
+            var before   = sentence.substr(0, pos);
+            var word     = "";
+            if (event.shiftKey) {
+                word = "⎿ ";
+            } else {
+                word = "｜ ";
+            }
+            var after    = sentence.substr(pos, len);
+
+            textarea.value = before + word + after;
+            textarea.selectionStart = pos + 2;
+            textarea.selectionEnd = pos + 2;
+        } else if (event.keyCode == 13 && event.ctrlKey) {
+            event.preventDefault();
+            RunCode();
+        }
+    });
+
+  </script>
+</body>
+</html>
+
+<!--
+    https://gihyo.jp/article/2023/04/monthly-python-2304
+    https://tadosuke.com/programming/5039/#index_id18
+
+    引数なしの場合にNoneになると実行時エラー -> Noneを削除で応急処置
+    保存したときにインデントが反映されていない
+
+    python -m http.server
+    http://localhost:8000/
+-->

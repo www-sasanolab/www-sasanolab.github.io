@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<head>
+  <title>遺伝的アルゴリズムによる消費エネルギーを考慮した移動ロボットの複数回通過を指定可能案なオフライン経路生成方式の提案および実装</title>
+  <link rel="stylesheet" type="text/css" href="prism.css" media="all" />
+  <script type="text/javascript" src="prism.js"></script>
+</head>
+<body>
+
+<h1></h1>
+
+このページでは、2022年3月 電子情報通信学会総合大会の論文「遺伝的アルゴリズムによる消費エネルギーを考慮した移動ロボットの複数回通過を指定可能なオフライン経路生成方式の提案および実装」で提示した方式を実装したプログラムのソースコードとその使い方を公開しています。</br>
+最初にソースコードを提示し，簡単な解説をします。その後，ソースコードの使い方を紹介します。最後に，このソースコードを用いた移動ロボットの経路生成シミュレーションの実験を紹介します。
+
+<h2>ソースコードとその解説</h2>
+本研究で実装したプログラムは全てC++言語で実装しています。また，roomba693を動作させるにあたり，サイモンフレーザー大学Autonomy研究室が公開しているlibcreateというC++言語のライブラリを利用しています。そのため，ここで紹介するソースコードはlibcreateの動的ライブラリやヘッダーファイルを必要とします。これについては<a href="index.html#use">使い方</a>の章で再度詳しく触れます。
+
+<h3>経路生成プログラム(ga7.cpp)</h3>
+<p>移動ロボットの経路生成シミュレーションのソースコードです。初期の経路(ユーザが任意で指定)を読み込み，遺伝的アルゴリズムを適用することで消費エネルギーを抑えた経路を生成します。生成する経路がマップのセルを何回通過するか指定可能です(現状は2回通過までしか対応していません)。</p>
+<pre class="line-numbers"><code class="language-cpp">
+#include &lt;iostream&gt;
+#include &lt;iomanip&gt;
+#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+#include &lt;time.h&gt;
+
+#include "create/create.h"
+
+extern int coordinate[31][31];
+extern int start_x,start_y;
+
+typedef struct{
+	int score;
+	std::vector&lt;char&gt; route;
+	int pass_miss;
+}path;
+
+typedef struct{
+	char move;
+	int times;
+}m_selection;
+
+bool comparisonFunc(const path &a,const path &b);
+bool comparisonMselection(const m_selection &a,const m_selection &b);
+
+int main(){
+
+	int len[1024];
+	int path_num = 0;
+	int parents_num = 0;
+	int generation = 1000;
+	
+	std::cout &lt;&lt; "You can choose generation number: ";
+	std::cin &gt;&gt; generation;
+	std::cout &lt;&lt; std::endl;
+	int generation_n = generation;
+	int extension = 0;
+	int extension2 = 0;
+
+	int iteration = 1;
+	int ite = 1;
+	std::cout &lt;&lt; "Decide how many times you want to pass through the cell : ";
+	std::cin &gt;&gt; iteration;
+	std::cout &lt;&lt; std::endl;
+	
+	double frequency = 1.0;
+	std::cout &lt;&lt; "How many mutations are there ? (Usually once.) :";
+	std::cin &gt;&gt; frequency;
+	std::cout &lt;&lt; std::endl;
+	
+	double frequency_tmp = frequency;
+	double same_move;
+	std::cout &lt;&lt; "If it is the same as previous or next action, what is the frequency?(specify with a decimal point) :";
+	std::cin &gt;&gt; same_move;
+	std::cout &lt;&lt; std::endl;
+	double same_moveBoth;
+	std::cout &lt;&lt; "If it is the same as previous and next action, what is the frequency?(specify with a decimal point) :";
+	std::cin &gt;&gt; same_moveBoth;
+	std::cout &lt;&lt; std::endl;
+	double moveFirstf;
+	std::cout &lt;&lt; "If the first action is f, what is the frequency?(specify with a decimal point) :";
+	std::cin &gt;&gt; moveFirstf;
+	std::cout &lt;&lt; std::endl;
+	double same_moveFirstf;
+	std::cout &lt;&lt; "If the first action is f, and the next action is also f, what is the frequency?(specify with a decimal point) :";
+	std::cin &gt;&gt; same_moveFirstf;
+	std::cout &lt;&lt; std::endl;
+
+	/*int leave = 3;
+	std::cout &lt;&lt; "Decide how much of the mutation you want to keep : ";
+	std::cin &gt;&gt; leave;
+	std::cout &lt;&lt; std::endl;*/
+
+	srand((unsigned)time(NULL));
+
+	const char *file = "sample";
+	FILE *fp = NULL;
+	char a[4096];
+	int n = 0;
+	int tmp_n = 0;
+
+	fp = fopen(file,"r");
+	if(fp==NULL){
+		std::cout &lt;&lt; file &lt;&lt; " file not open" &lt;&lt; std::endl;
+		return 0;
+	}
+
+	while(fscanf(fp,"%c",&(a[n])) != EOF){
+		while(a[n] != '\n'){
+			n++;
+			fscanf(fp,"%c",&(a[n]));
+		}
+		len[path_num]=n-tmp_n;
+		path_num++;
+		n++;
+		tmp_n = n;
+	}
+
+	parents_num = path_num / 2;
+	fclose(fp);
+
+	std::vector&lt;path&gt; parents(path_num);
+	std::vector&lt;path&gt; child(path_num);
+	std::vector&lt;path&gt; child_tmp(path_num);
+	path child_tmp2;
+
+	for(int i=0;i&lt;path_num;i++){
+		parents[i].route.resize(len[i]);
+	}
+	
+	int sum = 0;
+	for(int i=0;i&lt;path_num;i++){
+		for(int j=0;j&lt;len[i];j++) parents[i].route[j] = a[sum+j];
+		sum = len[i] + sum + 1;
+	}
+
+	for(int i=0;i&lt;path_num;i++){
+		for(int j=0;j&lt;len[i];j++) std::cout &lt;&lt; parents[i].route[j];
+		start_pos s = map();
+		coordinate[s.x][s.y]=1;
+		start_x = s.x;
+		start_y = s.y;
+		parents[i].score = scoreCalc(parents[i].route.data(),len[i]);
+		parents[i].pass_miss = checkPassmiss_ite(ite);
+		std::cout &lt;&lt; " :this score is " &lt;&lt; parents[i].score &lt;&lt; " and, ";
+		std::cout &lt;&lt; "pass miss : " &lt;&lt; parents[i].pass_miss &lt;&lt; std::endl;
+	}
+	std::cout &lt;&lt; std::endl;	
+	
+	//ga start.
+	while(generation &gt; 0){
+
+
+		sort(parents.begin(),parents.end(),comparisonFunc);
+
+		//excelent g inherited
+		for(int i=0;i&lt;parents_num;i++){
+			child[i].route.resize(parents[i].route.size());
+		       	child[i] = parents[i];
+		}
+		for(int i= parents_num;i&lt;path_num;i++){
+			child[i].route.resize(parents[i-parents_num].route.size());
+		 	child[i] = parents[i-parents_num];
+			child_tmp[i].route.resize(child[i].route.size());
+			child_tmp[i] = child[i];
+		}
+		
+		for(int i= parents_num;i&lt;path_num;i++){
+			int child_psms = child[i].pass_miss; 
+			for(unsigned int j=0;j&lt;child[i].route.size();j++){
+				
+				if(j==0){
+					if(child[i].route[j]=='f'){
+					       	frequency = moveFirstf;
+						if(child[i].route[j]==child[i].route[j+1]) frequency = same_moveFirstf;
+					}
+					if(child[i].route[j]!='f' && child[i].route[j]==child[i].route[j+1]) frequency = same_move;
+				}
+				if(j&gt;0 && child[i].route.size()-1&gt;j){
+					if(child[i].route[j]==child[i].route[j-1] || child[i].route[j]==child[i].route[j+1]) frequency = same_move;
+					if(child[i].route[j]==child[i].route[j-1] && child[i].route[j]==child[i].route[j+1]) frequency = same_moveBoth;
+				}
+				if(j==child[i].route.size()-1 && child[i].route[j]==child[i].route[j-1]) frequency = same_move;
+
+				if(rand() % int(child[i].route.size()/frequency) == 0){
+					int random = rand() % 3;
+					char tmp_move = child[i].route[j];
+					if(tmp_move == 'f'){
+						if(random == 0) child[i].route[j] = 'b';
+						else if(random == 1) child[i].route[j] = 'r';
+						else if(random == 2) child[i].route[j] = 'l';
+					}else if(tmp_move == 'b'){
+						if(random == 0) child[i].route[j] = 'f';
+						else if(random == 1) child[i].route[j] = 'r';
+						else if(random == 2) child[i].route[j] = 'l';
+					}else if(tmp_move == 'r'){
+						if(random == 0) child[i].route[j] = 'f';
+						else if(random == 1) child[i].route[j] = 'b';
+						else if(random == 2) child[i].route[j] = 'l';
+					}else{
+						if(random == 0) child[i].route[j] = 'f';
+						else if(random == 1) child[i].route[j] = 'b';
+						else if(random == 2) child[i].route[j] = 'r';
+					}
+					
+					std::vector&lt;char&gt; route_mid;
+					route_mid.resize(j+1);
+					for(unsigned int m=0;m&lt;j+1;m++) route_mid[m] = child[i].route[m];
+
+					start_pos s = map();
+					coordinate[s.x][s.y]=1;
+					start_x = s.x;
+					start_y = s.y;
+					move_count mutant = moveEmu(route_mid.data(),j+1);
+
+					if(mutant.conflict_n &gt; 0) child[i].route[j] = tmp_move;
+					else{
+						s=map();
+						coordinate[s.x][s.y]=1;
+						start_x = s.x;
+						start_y = s.y;
+						move_count mutan = moveEmu(child[i].route.data(),child[i].route.size());
+						child[i].pass_miss = checkPassmiss_ite(ite);
+
+						if(child[i].pass_miss&gt;child_psms || mutan.conflict_n&gt;0){
+							s=map();
+							coordinate[s.x][s.y]=1;
+							start_x = s.x;
+							start_y = s.y;
+							position area = moveFinish(child[i].route.data(),j+1);
+							std::vector&lt;m_selection&gt; neigh(4);
+							for(unsigned int m=j+1;m&lt;child[i].route.size();m++){
+								neigh[0].times=coordinate[start_x+area.x][start_y+area.y-1];
+								neigh[0].move='f';
+								neigh[1].times=coordinate[start_x+area.x+1][start_y+area.y];
+								neigh[1].move='r';
+								neigh[2].times=coordinate[start_x+area.x-1][start_y+area.y];
+								neigh[2].move='l';
+								neigh[3].times=coordinate[start_x+area.x][start_y+area.y+1];
+								neigh[3].move='b';
+
+								sort(neigh.begin(),neigh.end(),comparisonMselection);
+								int min_n=1;
+								int min = neigh[0].times;
+								for(int u=1;u&lt;4;u++){
+									if(min==neigh[u].times) min_n++;
+								}
+								char sel_m[min_n];
+								for(int u=0;u&lt;min_n;u++) sel_m[u]=neigh[u].move;
+
+								char selected_m;
+								if(min_n==1) selected_m = neigh[0].move;
+								else if(min_n==2){
+									int ran = rand()%2;
+									selected_m = sel_m[ran];
+								}else if(min_n==3){
+									int ran = rand()%3;
+									selected_m = sel_m[ran];
+								}else if(min_n==4){
+									int ran = rand()%4;
+									selected_m = sel_m[ran];
+								}
+
+								child[i].route[m]=selected_m;
+								s=map();
+								coordinate[s.x][s.y]=1;
+								start_x = s.x;
+								start_y = s.y;
+								area = moveFinish(child[i].route.data(),m+1);
+							}
+						}
+					}
+				}
+				frequency = frequency_tmp;
+				start_pos s=map();
+				coordinate[s.x][s.y]=1;
+				start_x = s.x;
+				start_y = s.y;
+				child[i].score = scoreCalc(child[i].route.data(),child[i].route.size());
+				child_psms = checkPassmiss_ite(ite);
+			        	
+			}
+			if(child_tmp[i].route != child[i].route){
+			
+				start_pos s = map();
+				coordinate[s.x][s.y]=1;
+				start_x = s.x;
+				start_y = s.y;
+				child[i].score = scoreCalc(child[i].route.data(),child[i].route.size());
+				child[i].pass_miss = checkPassmiss_ite(ite);
+
+				if(child[i].pass_miss&gt;child_tmp[i].pass_miss){
+					//child_tmp2.route.resize(child[i].route.size());
+					//child_tmp2 = child[i];
+					child[i] = child_tmp[i];
+					//if(rand()%leave == 0) child[i] = child_tmp2;
+				}
+			}
+		}
+		for(int i=0;i&lt;path_num;i++){
+			parents[i].route.resize(child[i].route.size());
+		       	parents[i] = child[i];
+		}
+
+		generation -= 1;
+
+		if(generation==0 && parents[0].pass_miss!=0){
+			generation += generation_n;
+			if(ite == 1){
+			       	extension += 1;
+				std::cout &lt;&lt; "now,extension: " &lt;&lt; extension &lt;&lt; std::endl;
+			}else{
+			       	extension2 += 1;
+				std::cout &lt;&lt; "now,extension2: " &lt;&lt; extension2 &lt;&lt; std::endl;
+			}
+		}else if(generation==0 && parents[0].pass_miss==0){
+			for(int i=0;i&lt;path_num;i++){
+
+				
+				for(unsigned int j=0;j&lt;parents[i].route.size();j++) std::cout &lt;&lt; parents[i].route[j];
+				std::cout &lt;&lt; std::endl;
+
+				start_pos s = map();
+				coordinate[s.x][s.y]=1;
+				start_x = s.x;
+				start_y = s.y;
+				
+				int cut = moveNum(parents[i].route.data(),parents[i].route.size(),ite);
+				parents[i].route.resize(cut+1);
+
+				s = map();
+				coordinate[s.x][s.y]=1;
+				start_x = s.x;
+				start_y = s.y;
+				parents[i].score = scoreCalc(parents[i].route.data(),parents[i].route.size());
+				parents[i].pass_miss = checkPassmiss_ite(ite);
+
+
+				for(unsigned int j=0;j&lt;parents[i].route.size();j++) std::cout &lt;&lt; parents[i].route[j];
+				std::cout &lt;&lt; ":length : " &lt;&lt; parents[i].route.size() &lt;&lt; std::endl;
+				std::cout &lt;&lt; "-----------------------------------" &lt;&lt; std::endl;
+				
+			}
+
+			if(iteration&gt;1){
+				std::cout &lt;&lt; "path expand!" &lt;&lt; std::endl;
+				ite = iteration;
+				iteration = 1;
+				unsigned int size_tmp[path_num];
+				for(int i=0;i&lt;path_num;i++){
+					unsigned int size = parents[i].route.size();
+					parents[i].route.resize(size*ite);
+					unsigned int tir =1;
+					for(unsigned int j=size;j&lt;parents[i].route.size();j++){
+						if(tir&gt;size) tir = 1;
+
+						if(parents[i].route[j-(2*tir-1)]=='f') parents[i].route[j]='b';
+						else if(parents[i].route[j-(2*tir-1)]=='b') parents[i].route[j]='f';
+						else if(parents[i].route[j-(2*tir-1)]=='r') parents[i].route[j]='l';
+						else if(parents[i].route[j-(2*tir-1)]=='l') parents[i].route[j]='r';
+						
+						tir += 1;
+					}
+					size_tmp[i]=size;
+				}
+				//std::cout &lt;&lt; "hey!" &lt;&lt; std::endl;
+				
+				for(int i=0;i&lt;path_num;i++){
+					if(parents[i].route[size_tmp[i]-1]=='f'){
+						parents[i].route.insert(parents[i].route.begin()+size_tmp[i],'b');
+						parents[i].route.insert(parents[i].route.begin()+size_tmp[i]+1,'f');
+					}else if(parents[i].route[size_tmp[i]-1]=='r'){
+						parents[i].route.insert(parents[i].route.begin()+size_tmp[i],'l');
+						parents[i].route.insert(parents[i].route.begin()+size_tmp[i]+1,'r');
+					}else if(parents[i].route[size_tmp[i]-1]=='l'){
+						parents[i].route.insert(parents[i].route.begin()+size_tmp[i],'r');
+						parents[i].route.insert(parents[i].route.begin()+size_tmp[i]+1,'l');
+					}else if(parents[i].route[size_tmp[i]-1]=='b'){
+						parents[i].route.insert(parents[i].route.begin()+size_tmp[i],'f');
+						parents[i].route.insert(parents[i].route.begin()+size_tmp[i]+1,'b');
+					}
+				}
+
+				for(int i=0;i&lt;path_num;i++){
+					start_pos s;
+					s=map();
+					coordinate[s.x][s.y]=1;
+					start_x = s.x;
+					start_y = s.y;
+					parents[i].score = scoreCalc(parents[i].route.data(),parents[i].route.size());
+					parents[i].pass_miss = checkPassmiss_ite(ite);
+				}
+
+				for(int i=0;i&lt;path_num;i++){
+					for(unsigned int j=0;j&lt;parents[i].route.size();j++) std::cout &lt;&lt; parents[i].route[j];
+					std::cout &lt;&lt; ": socre is " &lt;&lt; parents[i].score;
+					std::cout &lt;&lt; ". pass miss is " &lt;&lt; parents[i].pass_miss &lt;&lt; std::endl;
+				}
+				generation += generation_n;	
+			}			
+		}
+	}
+
+	std::cout &lt;&lt; "parents's final score is " &lt;&lt; parents[0].score &lt;&lt; ". and this pass miss is " &lt;&lt; parents[0].pass_miss &lt;&lt; "." &lt;&lt; std::endl;
+	std::cout &lt;&lt; "The number of extensions is " &lt;&lt; extension &lt;&lt; "."  &lt;&lt; std::endl;
+	std::cout &lt;&lt; "And this route is "; 
+	for(unsigned int i=0;i&lt;parents[0].route.size();i++){
+		std::cout &lt;&lt; parents[0].route[i];
+	}
+	std::cout &lt;&lt; ": character num : " &lt;&lt; parents[0].route.size();
+	std::cout &lt;&lt; std::endl;
+	 
+	return 0;
+}
+
+
+bool comparisonFunc(const path &a,const path &b){
+	return a.score &lt; b.score;
+}
+bool comparisonMselection(const m_selection &a,const m_selection &b){
+	return a.times &lt; b.times;
+}
+
+</code></pre>
+<p><b>29行目～68行目 [染色体に関する変数宣言と突然変異の確率などの初期設定]</b></br>
+<ul>
+  29行目～68行目では染色体の長さや染色体の数など，染色体に関する変数宣言と突然変異が起こる確率や遺伝的アルゴリズムの繰り返し回数(=世代数)の初期設定などを行います。</br>
+  <li>int len[1024]はint型の配列で染色体の長さを格納します。現状1024本の染色体に対応できることになります。例えば，染色体が4本あった場合，len[0]に最初の染色体の長さが，len[1]に2番目の染色体の長さが格納されています。長さを格納する変数があることで，染色体が固定長ではなく，自由に長さを設定できるようになっています。</li>
+  <li>int path_numはint型の変数で染色体の数を格納します。path_numが8の場合，染色体が全部で8本あることになります。</li>
+  <li>int parents_numはint型の変数で染色体の総数の半分です。つまり，parent_numとpath_num/2は等しいことになります。この遺伝的アルゴリズムでは，母集団のうち上位半分は必ず次世代の親染色体にするので，染色体の総数の半分の数を知る必要があります。</li>
+  <li>int generationはint型の変数で遺伝的アルゴリズムの繰り返し回数を表しています。初期値は1000ですが，ユーザが任意で変更可能です。34～36行目でgeneration変数の入力を受け付けています。</li>
+  <li>41～45行目ではint型の変数iterationに値を入力し，マップ上のセルの通過回数を設定します。例えば，iterationを2に設定した場合，マップ上のセルを最低2回通過する経路を生成するようになります。本研究は複数回通過を謳っていますが，現状2回通過までしか対応させていません。しかし，3回・4回通過まで拡張させることは容易です。</li>
+  <li>47～68行目は全て突然変異の確率の設定です。47～50行目は，通常の突然変異の確率の設定を行う箇所で，初期値では1回だけ突然変異するようになっています。この箇所で変数frequencyを2に設定すると，染色体の中の2つの遺伝子が突然変異する確率に設定し直されることになります。53～56行目では突然変異対象の遺伝子の前の遺伝子または後の遺伝子が，突然変異対象の遺伝子と同じだった場合の突然変異確率の設定をする箇所です。前後の遺伝子と同じ遺伝子だった場合，ロボットの動作は直進になります。直進動作は消費エネルギーが小さいため，この場合，突然変異を起こさないほうがよいと判断できます。そのため，変数same_moveには小数を設定し，突然変異を起こしづらくすることができます(しなくてもよいです)。57～60行目・61～64行目・65～68行目も特殊なケースの突然変異の確率設定です。</li>
+</ul>
+</p>
+<p><b>77～101行目 [初期染色体の読み込み]</b></br>
+  <ul>
+    77行目～101行目は初期染色体の情報を読み込み，前述の染色体に関する変数の値を確定させていくフェーズになります。
+    <li>初期染色体の情報は別ファイルにあります。本研究ではga7.cppの実行ファイルと同じディレクトリにsampleファイルを置き，そこに初期染色体の情報を格納していました。
+      <pre class="line-numbers"><code class="language-cpp">brbbbb
+flrb
+flllllll
+lrlrb</pre></code>
+       上記がsampleファイルの一例です。上記のファイルでは染色体が4つあることになります。
+    </li>
+    <li>77行目～87行目で，このsampleファイルを開いています。</li>
+    <li>89行目～98行目で，fscanf関数を用いてsampleファイルから染色体の数(変数path_numに格納)，染色体それぞれの長さ(len[]に格納)を求めています。また，fscanf関数を用いて染色体の遺伝子(上記の例でいうところの「brbbbb」や「flrb」など)を変数a[]に格納しています。現状，全ての染色体の遺伝子の遺伝子数は4096に納めるようにしなければなりません(79行目)。改行コードにより染色体の数を求めるので(90行目)，sampleファイルでは一つの染色体を同一行に書き，別の染色体は改行し，それもまた改行先に納めるようにしてください。</li>
+  </ul>
+</p>
+<p><b>103行目～129行目 [親染色体(初期染色体)の設定]</b></br>
+  <ul>
+    ここまでの段階で染色体の情報をsampleファイルから得ることはできていますが，その情報をそれぞれの親染色体に設定するところまではできていません。そこで103行目～129行目では親染色体の設定をしていきます。
+    <li>103行目～106行目は親染色体を表す変数(parents)と子染色体を表す変数(child)を宣言しています。これら変数の型は構造体のpath型(13～17行目)の配列となっています。構造体path型はint型のscoreとchar型の配列route，int型のpath_missの3つを持ちます。int型のscoreはその染色体の適応度，char型の配列routeはその染色体の遺伝子，int型のpath_missはその染色体がマップ上に描く経路が通過していないマスを何マス持つかを表しています。</li>
+    <li>108行目～116行目で，それぞれの親染色体の遺伝子の長さと具体的な遺伝子の格納を行っています。変数parentsのrouteは前述した通りchar型の配列です。これは染色体の遺伝子を格納する変数ですが,遺伝子の数(=染色体の長さ)は変数len[]に情報があるため，ここからの情報を元にchar型の配列の長さをリサイズします(108行目～110行目)。染色体の具体的な遺伝子はa[]に情報があるので，ここから具体的な遺伝子を受け取ります(112行目～116行目)。</li>
+    <li>最後に変数parentsのscoreとpass_missを格納します。scoreとpass_missはマップ情報とと染色体情報を参照し，マップ上に経路を描くシミュレーションをすることで求めることができます。これを行う関数がscoreCalc()とcheckPassmiss_ite()です(124行目と125行目)。この関数は別のC++ファイル(func_k.cpp)に実装しています。これらシミュレーションの関数を用いる際は，その直前に必ずmap()を呼び出す必要があります(120行目～123行目)。このmap()を用いることでマップ情報を読み込むことができ，シミュレーションの下準備が完了します。map()の実装は別のC++ファイル(map.cpp)にあります。func_k.cppとmap.cppは後ほど説明します。</li>
+  </ul>
+</p>
+<p><b>132行目～383行目 [遺伝的アルゴリズム]</b></br>
+  ここ(132行目のwhile文)から遺伝的アルゴリズムの処理に入ります。この処理は変数generationの数だけ繰り返します。
+</p>
+<p><b>135行目～147行目 [親染色体のソートと次世代の親染色体の生成，子染色体の生成]</b></br>
+  <ul>
+    親染色体を適応度(変数score)順にソートします。また，ソートされた上位半分の親染色体を次世代の親染色体にします。ソートされた上位半分を子染色体として複製もします。
+    <li>シミュレーション(124行目)により，すでに親染色体は自身の適応度(変数score)を持っています。この適応度を参照し，昇順にソートします。この適応度は消費エネルギーの合計値となっています。つまり消費エネルギーの小さい順にソートすることになります(135行目)。ソートするためにsort()を利用していますが，これは&lt;algorithm&gt;をインクルードすることで使えるC++の標準的なライブラリです。sort()はソートの仕方を自身で定義できます。今回はソートの仕方をcomparisonFunc()にて定義しています(398行目～400行目)。</li>
+    <li></li>
+  </ul>
+</p>
+<h2 id="use">使い方</h2>
+
+
+<h2>実験</h2>
+
+
+<h2>更新履歴</h2>
+<ul>
+  <li>2021年12月日 version 0.1.0を公開</li>
+</ul>
+
+</body>
+</html>

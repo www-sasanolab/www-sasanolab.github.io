@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<head>
+  <title>光るキーボードを用いた写経型プログラミング学習の支援に用いるアプリケーション(2022)</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+
+<h1>PRO142: 光るキーボードを用いた写経型プログラミング学習の支援</h1>
+
+<p>
+  このページでは，2023年1月 <a href="https://sigpro.ipsj.or.jp/pro2022-4/">情報処理学会 第142回プログラミング研究発表会</a>の論文「<a href="https://ipsj.ixsq.nii.ac.jp/ej/?action=pages_view_main&active_action=repository_view_main_item_detail&item_id=226784&item_no=1&page_id=13&block_id=8" target="_blank">光るキーボードを用いた写経型プログラミング学習の支援</a>」で提示した学習手法を実装したツールのソースコードを公開し，その使い方について解説します．
+</p>
+
+<h2>ソースコード</h2>
+
+<p>
+  <a href="program.zip" download>こちらのリンク</a>よりダウンロードしてください．<br>
+  なお，「ChromaSDKImpl.js」は，<a href="https://github.com/RazerOfficial/HTML5ChromaSDK" target="_blank">https://github.com/RazerOfficial/HTML5ChromaSDK</a>（Razer社のGitHubリポジトリ）より入手しました．
+</p>
+
+
+<h2>ツールの使い方</h2>
+
+<ol class="top">
+  <li>事前準備：RazerSynapse3のインストール
+    <ol class="inner">
+      <li><a href="https://www.razer.com/synapse-3?_ga=2.58856366.20778801.1666257340-1351975810.1655881020&_gl=1*14nm77g*_ga*MTM1MTk3NTgxMC4xNjU1ODgxMDIw*_ga_3TRK53PM75*MTY2NjI1NzM0MC43LjAuMTY2NjI1NzM0MC42MC4wLjA." target="_blank">Razer社のWebページ</a>（外部リンク）にアクセスする</li>
+      <li>［DOWNLOAD NOW］をクリックしてインストーラをダウンロードし，起動する</li>
+      <li>「インストールするソフトウェアを選択」の画面で［RAZER SYNAPSE］にチェックが入っていることを確認する</li>
+      <li>「任意のSynapseモジュール」の一覧の中の［CHROMA CONNECT］にチェックが入っていることを確認する</li>
+      <li>［インストール］をクリックし，ソフトウェアをインストールする</li>
+    </ol>
+  </li>
+  
+  <li>ツールの実行
+    <ol class="inner">
+      <li>上記リンクからダウンロードしたzipファイルを展開する</li>
+      <li>RazerSynapse3が起動していること，RazerChromaRGB対応のキーボードが接続されていることを確認する</li>
+      <li>ツール「index.html」を実行する</li>
+      <li>上部の［ファイルを選択］ボタンをクリックし，写経を実施したいサンプルコードのファイルを選択する</li>
+      <li>【サンプルコード】の部分にサンプルコードの内容が表示される</li>
+      <li>写経を進める
+	<ul class="innerinner">
+	  <li>次の文字を入力するために押すべきキーの位置が光り，次の文字を打つと【写経中のコード】の部分に反映される</li>
+	  <li>【写経中のコード】の部分の中で，現在入力中の場所は「｜」で示されている</li>
+	  <li>行頭のTab，途中のスペース，行末のEnterも入力する必要がある</li>
+	  <li>誤った入力をすると【写経中のコード】の部分が赤くなるが，BackSpaceキーを押すと元の状態に復帰する</li>
+	</ul>
+      </li>
+      <li>最後まで写経を完了させると，ダイアログが表示される
+	<ul class="innerinner">
+	  <li>［はい］を選択すると，写経したプログラムをダウンロードできる</li>
+	  <li>［キャンセル］を選択すると，そのまま写経を終了できる</li>
+	</ul>
+      </li>
+    </ol>
+    <ul class="inner">
+      <li>再度最初から写経を開始する方法
+	<ul class="innerinner">
+	  <li>同じサンプルコードで実施する場合，上部の［はじめから］ボタンをクリックする</li>
+	  <li>違うサンプルコードで実施する場合，上部の［ファイルを選択］ボタンをクリックし，ファイルを選択する</li>
+	</ul>
+      </li>
+    </ul>
+  </li>
+  <li>トラブルシューティング
+    <ul class="inner">
+      <li>【写経中のコード】の部分が表示されないなど，要素がうまく整列して表示されない
+	<ul class="innerinner">
+	  <li>ブラウザの設定から「ズーム」の値を縮小し，全体がうまく表示されるようにする</li>
+	</ul>
+      <li>ツールに操作を加えても反応しなくなった場合
+	<ul class="innerinner">
+	  <li>ページを再読み込みする，もしくは，一度ブラウザを閉じてツールを再起動する</li>
+	</ul>
+      </li>
+    </ul>
+  </li>
+</ol>
+
+<h2>論文情報</h2>
+<p>
+  平澤巧望, 篠埜 功, <a href="https://ipsj.ixsq.nii.ac.jp/ej/?action=pages_view_main&active_action=repository_view_main_item_detail&item_id=226784&item_no=1&page_id=13&block_id=8" target="_blank">光るキーボードを用いた写経型プログラミング学習の支援</a>, 情報処理学会第142回プログラミング研究発表会, 2022-4-(5), 広島市立大学サテライトキャンパス, 2023年1月12日〜13日（2023年1月13日平澤巧望発表）. 情報処理学会論文誌プログラミング（PRO）Vol. 16, No. 2, pp. 1-27. 2023年6月.
+</p>
+
+<h2>更新履歴</h2>
+
+<ul class="top">
+  <li>2024/06/07
+    <ul class="inner">
+      <li>論文情報を更新しました．</li>
+    </ul>
+  </li>
+  <li>2022/11/26
+    <ul class="inner">
+      <li>ツールの使い方を更新しました．</li>
+      <li>ソースコードを公開しました．</li>
+    </ul>
+  </li>
+  <li>2022/11/02
+    <ul class="inner">
+      <li>ツールの使い方を公開しました．</li>
+    </ul>
+  </li>
+  <li>2022/11/01
+    <ul class="inner">
+      <li>ページを作成しました．</li>
+    </ul>
+  </li>
+</ul>
+  
+</body>
+</html>

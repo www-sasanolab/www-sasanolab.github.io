@@ -1,0 +1,11 @@
+------History-------
+2010 Mar. 24 ver.0.10 The algorithm is changed. 
+    -- This version is faster than the older versions.
+2010 Mar. 19 ver.0.06 Bug fix
+2010 Mar. 19 ver.0.05 Bug fix
+2010 Feb.  9  ver.0.04 Bug fix
+2010 Feb.  5  ver.0.03 The syntax is extended. 
+    -- Let expression can have more than one declarations.
+    -- The message for debuging is made off by deafault. 
+2010 Jan. 28 ver.0.02 Bug fix
+2010 Jan. 08 ver.0.01 First release

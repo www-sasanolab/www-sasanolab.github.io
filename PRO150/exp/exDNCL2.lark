@@ -1,0 +1,85 @@
+//?start: [(line)+]
+
+?start: [(ctrl)*] [(state)+]
+ctrl: ("｜" | "⎿")
+
+?state: expr | mul_assignment | def_function | return_state | break_state | function_nv | selection | repetition
+mul_assignment: assignment ("," assignment)*
+def_function: "関数" var_name "(" [tuple_e] ")" "を定義する:" // 英字のみ
+return_state: "値" [tuple_e] "を返す"
+break_state: "ループから抜ける"
+assignment: ((var_name | list_elem | list_name) ("," (var_name | list_elem | list_name))*) "=" (expr | input | input_int)
+input: "【外部からの入力】"
+input_int: "【外部からの整数入力】"
+
+?function_nv: print | print_space | print_no_break | init_list_zeros | append
+print: "表示する(" [tuple_e] ")"
+print_space: "末尾に空白を入れて表示する(" [tuple_e] ")"
+print_no_break: "末尾で改行せずに表示する(" [tuple_e] ")"
+init_list_zeros: list_name "の" ("すべて" | "全て") "の値を" ("0" | "０") "にする"
+append: list_name ".追加(" expr ")"
+
+?selection: s_if | s_elif | s_else
+s_if: "もし" expr "ならば:"
+s_elif: "そうでなくもし" expr "ならば:"
+s_else: "そうでなければ:"
+
+?repetition: r_for_inc | r_for_dec | r_while
+r_for_inc: var_name "を" expr "から" expr "まで" expr "ずつ増やしながら繰り返す:"
+r_for_dec: var_name "を" expr "から" expr "まで" expr "ずつ減らしながら繰り返す:"
+r_while: expr "の間繰り返す:"
+
+?expr: (fact | function | eq | neq | gt | mt | lt | le | add | sub | mul | div | quo | mod | pow | and_e | or_e | not_e) | function_call
+add: expr "+" expr
+sub: expr "-" expr
+mul: expr "*" expr
+div: expr "/" expr
+quo: expr "÷" expr
+mod: expr "%" expr
+pow: expr "**" expr
+eq: expr "==" expr
+neq: expr "!=" expr
+gt: expr ">" expr
+mt: expr ">=" expr
+lt: expr "<" expr
+le: expr "<=" expr
+and_e: expr "and" expr
+or_e: expr "or" expr
+not_e: "not" expr
+function_call: var_name "(" [tuple_e] ")"
+
+?function: len | max | min | sum | trans_int | rand_int
+len: "要素数(" list_name ")"
+max: "最大値(" list_name ")"
+min: "最小値(" list_name ")"
+sum: "総和(" list_name ")"
+trans_int: "整数(" expr ")"
+rand_int: "整数乱数(" expr "," expr ")"
+
+?fact: priority | my_number | string | var_name | list_elem | list_name | list | priority
+my_number: NUMBER | pos_number | neg_number
+pos_number: "+" NUMBER
+neg_number: "-" NUMBER
+string: ESCAPED_STRING
+var_name: init_var 
+init_var: ("a".."z"|"_") ("_"|LETTER|DIGIT)*
+list_elem: list_name ("[" expr "]")+
+list_name: ("A".."Z") ("_"|LETTER|DIGIT)*
+list: "[" (fact ("," fact)*)? "]"
+
+priority: "(" expr ")"
+
+
+tuple_e: expr ("," expr)*
+//_fn_name: /[^ 　()]+/ // 関数名には半角/全角スペース，()以外のすべての文字が使える
+
+%import common.ESCAPED_STRING
+%import common.LETTER
+%import common.DIGIT
+%import common.NUMBER
+%import common.CNAME
+%import common.WS
+%import common.SH_COMMENT
+
+%ignore WS
+%ignore SH_COMMENT

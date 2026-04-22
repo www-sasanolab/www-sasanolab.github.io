@@ -1,0 +1,75 @@
+<html>
+<head>
+<title>lambda-mode</title>
+<style type="text/css">
+body
+{
+    padding-left:20px;
+    padding-bottom: 20px;
+}
+</style>
+</head>
+<body>
+<h1>Lambda-mode version 0.10</h1>
+
+This page provides an implementation of variable name completion for a
+core functional language with let polymorphism in Emacs-mode.  We are
+planning to put the syntax of the language here later. 
+
+<h2>Install</h2>
+Read the following file about installation.<br />
+<a href="./readme.txt">readme.txt</a>
+
+<h2>Download</h2>
+Current version (version 0.10)
+<ul>
+<li> <a href="./lambda-mode.el">lambda-mode.el</a><br>
+<li> <a href="./lambda-make-candidates.el">lambda-make-candidates.el</a><br>
+<li> <a href="./lambda-inference.el">lambda-inference.el</a><br>
+<li> <a href="./lambda-parse-table.el">lambda-parse-table.el</a><br>
+<li> <a href="./lambda-data-structure.el">lambda-data-structure.el</a><br>
+<li> <a href="./lambda-default-env.el">lambda-default-env.el</a><br>
+<li> <a href="./lambda-util.el">lambda-util.el</a><br>
+</ul>
+<br />
+The auto-complete.el is obtained from <a href="http://www.cx4a.org/pub/auto-complete.el">here</a>.<br />
+
+(The author's website is <a href="http://dev.ariel-networks.com/Members/matsuyama/auto-complete" target="_blank">here</a> in Japanese.)<br>
+<br>
+Lambda mode has been developed with auto-complete.el 0.3.0 alpha.  Do
+not use the other versions of auto-complete since the lambda mode do
+work correctly with them.<br>
+<br>
+If you cannot get auto-complete.el from the above link, download from <a href="./auto-complete.el">here</a>.
+
+<br><br>
+Previous version of lambda mode is available <a href="./previousversions/index.html">here</a>.
+
+<h2>User's manual</h2>
+
+<ul>
+<li>Variable name completion<br>
+The candidates for completion are automatically displayed while typing identifiers without pressing keys such TAB key. </li>
+<li>Indentation<br>
+Lambda mode provides a functionality of simple indentation.
+To indent, just press TAB key.</li>
+</ul>
+
+<h2>Screenshot</h2>
+<img src="./meadow_lambda_mode_ss.png" />
+
+<h2>History</h2>
+<a href="./history.txt">history.txt</a>
+
+<h2>Comparison the current version with the previous versions</h2>
+
+While in the previous versions until version 0.06 not all the
+candidates are shown in the pop-up window, in the current version all
+the candidates are shown. Moreover the current version is substantially faster than the previous versions. 
+
+<hr>
+
+<a href="../">Back to the top page</a>
+</body>
+
+</html>

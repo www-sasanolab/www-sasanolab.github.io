@@ -1,0 +1,74 @@
+body
+{
+	background-image: url("./image/bg.png");
+}
+
+
+div.wrap
+{
+	margin-left: auto;
+	margin-right: auto;
+	width: 920px;
+
+}
+div.header
+{
+	width: 100%;
+	margin-top: 20px;
+	padding-bottom: 10px;
+	background-color: white;
+	
+}
+
+/*研究室名*/
+div.header h1
+{
+	margin: 0px;
+	text-align: left;
+	padding-left: 10px;
+	border-left: 10px solid green;
+	border-bottom: 2px solid green;
+	
+}
+
+div.header ul
+{
+	margin: 0px;
+	padding: 0px;
+	width: 520px;
+	height: 22px;
+	margin-left: auto;
+	border-right: 5px solid green;
+}
+
+/*メニューのli要素*/
+div.header ul li
+{
+	min-width: auto;
+	margin-left: 10px;
+	float: left;
+	text-align: center;
+	list-style: none;
+}
+
+
+/*メニューのリンク*/
+div.header ul li a
+{
+	font-size: 0.8em;
+	color: black;
+}
+/*メニューのリンクのonMouse時*/
+div.header ul li a:hover
+{
+	color: red;
+	font-weight: bold;
+}
+
+div.content
+{
+	clear: left;
+	margin-top: 30px;
+	width: 100%;
+	background-color: white;
+}

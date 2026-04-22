@@ -1,0 +1,60 @@
+<html>
+<head>
+  <style type="text/css">
+    <!--
+input#mybutton { width: 80px; height: 40px; font-weight: bold; }
+      -->
+  </style>
+  <title>課題提出ページ</title>
+</head>
+
+<body>
+<form action="./submit.cgi" 
+      enctype="multipart/form-data" 
+      method="post">
+
+課題提出ページ</br>
+番号等を選択、記入し、提出するファイルを選択し、送信ボタンを押してください。
+
+</br>
+
+<table border=1 cellpadding=3 cellspacing=0>
+  <tr>
+    <td>
+      <input name="kai" value="1" type="radio">1回
+      <input name="kai" value="2" type="radio">2回
+      <input name="kai" value="3" type="radio">3回
+      <input name="kai" value="4" type="radio">4回
+      <input name="kai" value="5" type="radio">5回
+      <input name="kai" value="6" type="radio">6回
+      <input name="kai" value="7" type="radio">7回
+      <input name="kai" value="9" type="radio">9回
+      <input name="kai" value="10" type="radio">10回
+      <input name="kai" value="11" type="radio">11回
+      <input name="kai" value="12" type="radio">12回
+      <input name="kai" value="13" type="radio">13回
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <input name="kihon-hatten" value="1" type="radio">基本
+      <input name="kihon-hatten" value="2" type="radio">発展
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <input name="bangou" maxlength="1" size="1" type="text">番
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <input type="file" name="program">
+    </td>
+  </tr>
+</table>
+<p>
+<input id="mybutton" type="submit" value="送信">
+  
+</form>
+</body>
+</html>

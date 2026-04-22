@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+  <title>Identifier completion presented in mpse2014</title>
+</head>
+<body>
+<h1>Identifier completion for incomplete program text
+based on Yacc error recovery</h1>
+This page provides an implementation of identifier completion for a
+small subset of Standard ML as an Emacs-mode based on the approach
+presented in the following paper:
+
+<ul>
+<li>
+<a href="http://www.sic.shibaura-it.ac.jp/~sasano">
+Isao Sasano</a>, 
+<a href="https://dl.acm.org/doi/10.4108/icst.bict.2014.257909">
+<b>Toward Modular Implementation of Practical Identifier Completion
+on Incomplete Program Text</b></a>,
+<em>
+BICT 2014 Special Track on Modularization for Practical Software Engineering
+</em>
+(<a href="http://bionetics.org/2014/show/workshop-mpse">MPSE 2014</a>), 
+Boston, MA, USA, December 1-3, 2014.
+</ul>
+ 
+<h2>How to use</h2>
+Download 
+<a href="./mode.tar.gz">mode.tar.gz</a>,
+unzip and untar it, and then follow the instructions in README file.<br>
+A bug was fixed on Jan 6, 2015.<br>
+Another bug was fixed on Feb 16, 2015.
+
+<h2>Screen shot</h2>
+<img src="./popup.png" />
+
+<h2>An example of using <tt>yyerrok;</tt></h2>
+As for the discussion in Section 4.5 in the paper above, 
+add the special statement <tt>yyerrok;</tt> in the action description
+in the case of <tt>LET dec IN exp error</tt> in the file "sml.y" as follows.
+<pre>
+| LET dec IN exp error
+{
+  yyerrok;
+  $$ = make_atexp4 ($2, $4);
+}
+</pre>
+This enables the completion on the example
+in Section 4.5.
+
+<hr>
+
+</body>
+</html>

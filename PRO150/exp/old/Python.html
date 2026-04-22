@@ -1,0 +1,108 @@
+<html lang="ja">
+<head>
+  <meta charset="utf-8"/>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+  <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+
+  <title>Python</title>
+</head>
+<body>
+
+  <py-config>
+    terminal = false
+  </py-config>
+
+  <a href="Python.html" style="font-size: x-large; margin: 10px;" target="_blank"><button>CreateNew</button></a>
+  <button onclick="RunCode();" style="font-size: x-large; margin: 10px;">Run</button> 
+  <button onclick="SaveProgram();" style="font-size: x-large; margin: 10px;">SaveProgram</button>
+  <button onclick="Submit();" style="font-size: x-large; margin: 10px;">CopyToSubmit</button> 
+  <input name="inputFile" type="file" id="file">
+  <div id="result" style="font-size: x-large; margin: 10px;"></div>
+  <div id="content" style="display:flex; height:95%; width: 98%;">
+    <textarea id="codeSpace" cols="100"></textarea>
+  <div id="python_code"></div>
+
+  <script>
+    function RunCode() {
+      var program = '<py-script output="result">\n' + document.getElementById("codeSpace").value + "</py-script>";
+      document.getElementById('python_code').innerHTML = program;
+    }
+
+    function SaveProgram() {
+      if (confirm("現在のプログラムをファイルに書き出しますか？")) {
+        const blob = new Blob([document.getElementById("codeSpace").value],{type:"text/plain"});
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'myProgram.py';
+        link.click();
+      }
+    }
+
+    function Submit() {
+      if (confirm("表示されている実行結果をコピーしますか？")) {
+        const copy = document.getElementById("result").innerText;
+        navigator.clipboard.writeText(copy).then(
+          (success) => {
+            alert("コピーしました．");
+          },
+          (error) => {
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = copy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempTextArea);
+            alert("コピーしました．");
+          },
+        );
+      }
+    }
+
+    // ファイル読み込み
+    document.getElementById("file").addEventListener( 'change', function(e) {
+      var result = e.target.files[0];
+      var reader = new FileReader();
+      reader.readAsText(result);
+      reader.addEventListener('load', function() {
+        document.getElementById('codeSpace').value = reader.result;
+      })
+    })
+
+    // インデントの入力支援
+    var textarea = document.getElementById('codeSpace');
+    textarea.addEventListener('keydown', () => {
+        if (event.keyCode == 9) {
+            event.preventDefault();
+
+            var sentence = textarea.value;
+            var len      = sentence.length;
+            var pos      = textarea.selectionStart;
+
+            var before   = sentence.substr(0, pos);
+            var word     = "    ";
+            var after    = sentence.substr(pos, len);
+
+            textarea.value = before + word + after;
+            textarea.selectionStart = pos + 4;
+            textarea.selectionEnd = pos + 4;
+        } else if (event.keyCode == 13 && event.ctrlKey) {
+            event.preventDefault();
+            RunCode();
+        }
+    });
+
+  </script>
+</body>
+</html>
+
+<!--
+    https://gihyo.jp/article/2023/04/monthly-python-2304
+    https://tadosuke.com/programming/5039/#index_id18
+
+    引数なしの場合にNoneになると実行時エラー -> Noneを削除で応急処置
+    保存したときにインデントが反映されていない
+
+    python -m http.server
+    http://localhost:8000/
+-->

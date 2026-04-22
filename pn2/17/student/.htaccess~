@@ -1,0 +1,7 @@
+Options ExecCGI
+AddHandler cgi-script .cgi
+AuthType Digest
+AuthName "pn2-16"
+AuthDigestDomain /pn2/16/student/
+AuthUserFile "/home/cs/pn2pwd/16/digestpwd_student"
+Require valid-user

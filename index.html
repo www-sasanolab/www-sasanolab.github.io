@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="ja">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Home | Programming Language Research Group</title>
+<link rel="stylesheet" type="text/css" href="./style.css">
+
+</head>
+<body>
+<div class="wrap">
+<div class="header">
+<h1>Programming Language Research Group</h1>
+	<ul>
+		<li><a href="index.html">Home</a></li>
+		<li><a href="member.html">Member (in Japanese)</a></li>
+		<li><a href="https://www.notion.so/55426b073de1498ab5ad1d9f81cfcc55">Internal (in Japanese)</a></li>
+		<li><a href="index-j.html">Home (in Japanese)</a></li>
+	</ul>
+</div>
+
+<div class="content">
+
+Our research aims at developing programming tools which utilize some
+research results in programming languages such as parsing, type
+systems, and program transformations. We develop tools for
+completion of syntax, identifiers, and expressions and detecting
+code clones in functional languages.
+
+<h2>Research topics</h2>
+<ul>
+  <li> Theory and implementation of programming tools
+    <ul>
+      <li> Identifier completion, syntax completion,  
+detecting code clones, etc., especially for functional langauges
+	<ul>
+	    <li><a href="https://doi.org/10.1016/j.scico.2023.102957">Syntax completion using LR parsing</a>
+	    <li><a href="./pepm2020">Syntax completion based on grammar transformation</a>
+	  <li> <a href="./lambda-mode/">
+	      Identifier completion for functional programs that do not have any
+	      type or syntax error up to cursor potision</a>
+         <li> <a href="./mpse2014/">Identifier completion for incomplete program text
+	  based on Yacc error recovery</a>
+	</ul>
+      <li> <a href="https://dl.acm.org/doi/10.1145/3018882.3018892">Type 3 code clone detection for Standard ML</a>
+      <li> Everything else about programming tools
+    </ul>
+  <li> Theory and implementation of tools for programming learning support
+    <ul>
+      <li> Visualization of overwriting the function return addresses 
+	for C programs
+      <li> Elimination of goto statements for C (replacing with, e.g., 
+	while, break, and continue statements)
+      <li> <a href="http://www.ipsj.or.jp/event/taikai/76/76program/data/pdf/1L-1.html">
+          A tool for visualizing pointers in C programs with supporting storage durations 
+          and scopes</a> (in Japanese)
+      <li> Everything else about programming learning support
+    </ul>
+</ul>
+
+We used to do the following topics as well but recently we are not involved in them.
+<ul>
+  <li> Sudoku (puzzle filling numbers, also called Number place)
+    <ul>
+      <li>Estimating the difficulty of Sudoku problems
+	<ul>
+	  <li><a href="http://www.ieice.org/ken/paper/20121126M0yd/">
+	      An approach to estimating the difficulty of Sudoku problems by Neural Network</a> (in Japanese)
+	</ul>
+      <li>Generating Sudoku problems supporting designation of initial placement
+    </ul>
+  <li> Fusion of recursive functions
+  <li> Derivation of graph algorithms
+</ul>
+
+<h2>Some materials</h2>
+<ul>
+<li>
+<a href="http://www.cs.ise.shibaura-it.ac.jp/wiki/wiki.cgi?page=Emacs%A5%E2%A1%BC%A5%C9%A4%CE%BD%F1%A4%AD%CA%FD">
+How to write Emacs mode (written by a student in 2010, in Japanese)</a>
+<li>
+<a href="http://www.cs.ise.shibaura-it.ac.jp/wiki/wiki.cgi?page=How+to+write+plug-ins+for+Eclipse">
+How to write Eclipse plug-ins (written by a student in 2010 from Brazil)</a>
+</ul>
+</div>
+</div>
+
+</body>
+</html>
