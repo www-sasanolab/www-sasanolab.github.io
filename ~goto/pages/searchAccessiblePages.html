@@ -1,0 +1,509 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<style>
+	td
+	{
+		font-size: 15px;
+		text-align: center;
+		font-family:monospace;
+		
+	}
+
+	a:hover
+	{
+		color: #AAFFAA;
+	}
+
+	td.sid
+	{
+		background: #DDAAFF;
+		width: 100px;
+	}
+	td.res
+	{
+		width: 20px;
+	}
+
+	td.omover
+	{
+		background: #DD66FF;
+		cursor: pointer;
+	}
+	div#mybody
+	{
+		padding: 5px;
+		border:solid 2px #DD7766;
+	}
+
+</style>
+<script type="text/javascript" src="./prototype-1.6.0.3.js"></script>
+<script>
+<!--
+//var $ = function(id){return document.getElementById(id);};
+
+var addEvent = (window.addEventListener ?
+  function(element, type, func) {
+    element.addEventListener(type, func, false);
+  } :
+  function(element, type, func) {
+    element.attachEvent('on' + type, func);
+  });
+
+var MAX_STUDENT_ID = 150;
+var TABLE_LEN = 10;
+var BASE_URL = "http://www.sic.shibaura-it.ac.jp/~";
+
+var Departments = {
+	a:{
+			name: "機械",
+			exist: 0,
+			year: {}
+		},
+	b:{
+			name: "基地二",
+			exist: 0,
+			year: {}
+		},
+	c:{
+			name: "材料",
+			exist: 0,
+			year: {}
+		},
+	d:{
+			name: "応化",
+			exist: 0,
+			year: {}
+		},
+	e:{
+			name: "電気",
+			exist: 0,
+			year: {}
+		},
+	f:{
+			name: "通信",
+			exist: 0,
+			year: {}
+		},
+	g:{
+			name: "電子",
+			exist: 0,
+			year: {}
+		},
+	h:{
+			name: "土木",
+			exist: 0,
+			year: {}
+		},
+	j:{
+			name: "建築",
+			exist: 0,
+			year: {}
+		},
+	k:{
+			name: "建工",
+			exist: 0,
+			year: {}
+		},
+	l:{
+			name: "情報",
+			exist: 0,
+			year: {}
+		},
+	p:{
+			name: "電情",
+			exist: 0,
+			year: {}
+		},
+	q:{
+			name: "機械制御",
+			exist: 0,
+			year: {}
+		},
+	r:{
+			name: "環境",
+			exist: 0,
+			year: {}
+		},
+	n:{
+			name: "生命",
+			exist: 0,
+			year: {}
+		}
+};
+
+var zero = function(num,len){
+	var str = num+"";
+	for(i=0;i<len-(num+"").length;i++) str = "0"+str;
+	return str;
+}
+
+
+var animeChar = ['－','／','|','＼'];
+var waitChar = '待';
+var completeChar = '●';
+var failureChar = '×';
+
+var httpRequest = function(url,tdObj,parentSuccessCallBack,parentFailureCallBack){
+
+
+    this.status = 0;
+    /*
+    0:wait
+    1:requested
+    2:suc
+    3:fail
+    */
+    
+    
+    
+    if(this.status == 0) tdObj.innerHTML = waitChar;
+    
+    this.request = function(callback,cbFailure){
+        this.status = 1;
+        
+       
+        var para = {
+            method: 'get',
+            onSuccess: (function(callback,_this,parentCallBack){
+                return function(result){
+                    _this.status = 2;
+                    callback(_this);
+                    parentCallBack();
+                }
+            })(callback,this,parentSuccessCallBack),
+            
+            onFailure: (function(callback,_this,parentCallBack){
+                return function(){
+                    _this.status = 3;
+                    callback(_this);
+                    parentCallBack();
+                }
+            
+            })(cbFailure,this,parentFailureCallBack)
+        }
+         
+        var ajax = new Ajax.Request(url+"/",para);   
+        
+        //Timeout
+        setTimeout((function(ajax,para,status){
+            return function(){
+                if(status >= 2) return;
+                ajax = null;
+                para.onFailure();
+            }
+        })(ajax,para,this.status),5000);
+        
+        //Animation
+        (function(_this,tdObj){
+            //alert(_this.status);
+            var i=0;
+            return function(){
+                if(_this.status >= 2) {
+                    if(_this.status == 3) tdObj.innerHTML = failureChar;
+                    else tdObj.innerHTML = completeChar;
+                    return;
+                };
+                //$('debug').innerHTML = status;
+                
+                tdObj.innerHTML = animeChar[(i++)%animeChar.length];
+                setTimeout(arguments.callee,200);
+            }
+        })(this,tdObj)();
+    }
+    
+    
+    
+}
+
+var httpRequestQueue = function(){
+    var queue = this.queue = new Array();
+    this.finish = 0;
+    this.qLen = 0;
+    var MAX_REQUEST = this.MAX_REQUEST = 10;
+
+    var requested = this.requested = new Array(MAX_REQUEST);
+    this.status = 1;
+    /*
+    0:active
+    1:stop
+    */
+    
+
+    
+    for(var i=0;i<MAX_REQUEST;i++) requested[i] = null;
+    
+    
+    var delQueue = this.delQueue = (function(requested,_this){
+    
+        return function(httpReqObj){
+            for(var i=0;i<requested.length;i++) if(requested[i] ===httpReqObj){
+                requested[i] = null;
+                _this.finish++;
+                request();
+            }
+        }
+    })(requested,this);
+        
+    var request = (function(_this){
+        return function(){
+        //$('debug2').innerHTML = _this.status + "q:" +_this.queue.length;
+        with(_this) $('debug').innerHTML = "("+queue.length+")"+finish+"/"+qLen +"("+(Math.round((finish/qLen)*100))+"%)";
+        if(_this.status == 1) {
+            return;
+        }
+        
+        var i;
+        
+        for(i=0;i<MAX_REQUEST;i++){
+            if(_this.requested[i] == null) break;
+            if(i == MAX_REQUEST-1) return;
+        }
+        
+        if(_this.queue.length == 0) return;
+        
+        var httpObj = _this.queue.shift();
+        httpObj.request(_this.delQueue,_this.delQueue);
+        _this.requested[i] = httpObj;
+        }
+    })(this);
+    
+    this.begin = function(){
+        this.status = 0;
+        request();
+    }
+    this.stop = function(){
+        this.status = 1;
+    }
+    
+    this.addQueue = function(httpReqObj){
+        this.queue.push(httpReqObj);
+        this.qLen++;
+        //request();
+    }
+    
+    setInterval((function(_this){
+        return function(){
+            //with(_this) $('debug').innerHTML = "("+queue.length+")"+finish+"/"+qLen +"("+(Math.round((finish/qLen)*100))+"%)"; 
+        }
+    })(this),1000);
+    
+}
+
+var tableList = function (list, parent) {
+
+    var selectTable = document.createElement("table");
+    var arrivalListTitle = document.createElement('div');
+    var arrivalListDiv = document.createElement('div');
+
+    var queue = this.queue = new httpRequestQueue();
+
+
+    (function () {
+        var tbl = selectTable;
+        var tbd = document.createElement("tbody");
+        tbl.border = 1;
+        tbl.appendChild(tbd);
+
+        this.selectTable = tbl;
+
+        var tr = document.createElement('tr');
+
+        for (var d in list) {
+            var td = document.createElement('td');
+            td.innerHTML = "<b>" + list[d].name + "(" + d.toUpperCase() + ")</b>";
+            tr.appendChild(td);
+        }
+
+        tbd.appendChild(tr);
+        parent.appendChild(tbl);
+        parent.appendChild(document.createElement('hr'));
+        parent.appendChild(arrivalListTitle);
+        parent.appendChild(arrivalListDiv);
+    })();
+
+    this.addYear = function (year) {
+        var head = zero(year, 2); //2桁に揃える。
+
+        for (var d in list) {
+            var o = list[d];
+
+            var tbl = document.createElement("table");
+            var tbd = document.createElement("tbody");
+            tbl.border = 1;
+            tbl.appendChild(tbd);
+
+            var tr;
+
+            for (var i = 1; i <= MAX_STUDENT_ID; i++) {
+                if (i % TABLE_LEN == 1) tr = document.createElement('tr');
+
+                var url = BASE_URL + d + head + zero(i, 3);
+
+                var td1 = document.createElement('td');
+                var td2 = document.createElement('td');
+
+                tr.appendChild(td1);
+                tr.appendChild(td2);
+
+                var link = document.createElement('a');
+
+                link.appendChild(document.createTextNode(d + head + zero(i, 3)));
+                link.href = url;
+                link.target = '_blank';
+
+                td1.appendChild(link);
+                td2.appendChild(document.createTextNode('...'));
+
+                td1.setAttribute('class', 'sid');
+                td2.setAttribute('class', 'res');
+
+                //Ajax
+
+
+
+                var succ = ((function (list, course, head, num) {
+                    return function () {
+                        //list[course].year[year][num] = true;
+                        list[course].year[head].exist++;
+                        list[course].year[head].tdObj.innerHTML = course + zero(year, 2) + "(<font color=red>" + list[course].year[head].exist + "</font>)";
+                    }
+                })(list, d, head, i));
+
+                var fail = ((function (list, course, head, num) {
+                    return function () {
+
+                        // list[course].year[num] = false;  
+                        list[course].year[head].tdObj.innerHTML = course + zero(year, 2) + "(<font color=red>" + list[course].year[head].exist + "</font>)";
+                    }
+                })(list, d, head, i));
+
+                queue.addQueue(new httpRequest(url, td2, succ, fail));
+
+                if ((i + 1) % TABLE_LEN == 1) tbd.appendChild(tr);
+            }
+
+            o.year[head] = {
+                listObject: tbl,
+                list: new Array(MAX_STUDENT_ID),
+                exist: 0,
+                tdObj: null
+            }
+
+        }
+
+
+        (function () {
+            var tr = document.createElement('tr');
+            for (var d in list) {
+                var td = document.createElement('td');
+                td.innerHTML = d + head;
+                list[d].year[head].tdObj = td;
+                addEvent(td, 'click', (function (target, obj, name, head) {
+                    return function () {
+                        if (target.firstChild) target.removeChild(target.firstChild); ;
+                        target.appendChild(obj);
+                        arrivalListTitle.innerHTML = "<h2>" + name + " " + head + "年入学生</h2>";
+
+                    };
+                })(arrivalListDiv, list[d].year[head].listObject, list[d].name, head));
+
+                addEvent(td, 'mouseover', (function (obj) {
+                    return function () {
+                        obj.setAttribute('class', 'omover');
+                    }
+                })(td));
+                addEvent(td, 'mouseout', (function (obj) {
+                    return function () {
+                        obj.setAttribute('class', '');
+                    }
+                })(td));
+
+                tr.appendChild(td);
+            }
+            selectTable.firstChild.appendChild(tr);
+        })();
+    }
+}
+
+window.onload = function(){
+	var tbl = new tableList(Departments,$('mybody'));
+	var i = 4;
+	//for(var i=8;i<=8;i++)tbl.addYear(i);
+	
+	var httpReq = new httpRequestQueue();
+	
+	var suc = function(){ $('debug').innerHTML += 'suc _';};
+	var fail = function(){ alert('fail');};
+	
+	addEvent($('startButton'),'click',((function(tbl){
+	    return function(){
+	        tbl.queue.begin();
+	    }
+	})(tbl)));
+	
+	addEvent($('stopButton'),'click',((function(tbl){
+	    return function(){
+	        tbl.queue.stop();
+	    }
+	})(tbl)));
+	addEvent($('addYear'),'click',((function(tbl,i){
+	    return function(){
+	        if( (!isNaN($('year').value))&&(!(Departments.a.year[$('year').value])) ){
+	            
+	            tbl.addYear($('year').value);
+	        }else if(!(Departments.a.year[i++])) tbl.addYear(i-1);
+	    }
+	})(tbl,i)));
+	
+	//for(var i=0;i<500;i++) httpReq.addQueue(new httpRequest('./arrivalPages.html',$('Div1'),suc,fail));
+	
+}
+
+//-->
+</script>
+</head>
+<body>
+<h1>公開されてる学番HPを探すスクリプト</h1>
+<pre>
+<a href="./arrivalPages.html">これ</a>の強化版
+
+芝浦の学番HPに次々とアタックをかけてレスポンスのあったページを調べるツール
+また、それぞれのページへのリンクもあります。
+
+インデックスファイルがなくてもフォルダ公開状態ならページがあると判定します。
+
+HPの学外公開設定により、学内から実行するのと学外から実行するのでは結果が変わります。
+
+
+<font color=red>注意</font>
+学年を1つ追加すると約2000程のリクエストを投げつけます。
+
+動作確認ブラウザ：くろむ、Firefox3、IE6、IE8β
+
+IEだとやたら重いので他のブラウザ推奨。
+
+</pre>
+
+<hr />
+
+<input type="button" value="Begin" id='startButton' />
+<input type="button" value="Stop" id='stopButton' /><br />
+<input type="text" value='4' id="year" />
+<input type="button" value="学年を増やす" id='addYear' />
+
+<div id="mybody" style="width: auto;overflow:auto;">
+
+</div>
+<div id="debug" style="width: auto;overflow:auto;"></div>
+<hr />
+<div id="debug2" style="width: auto;overflow:auto;"></div>
+
+<hr />
+
+<div id="Div1" style="width: auto;overflow:auto;"></div>
+</body>
+</html>
+

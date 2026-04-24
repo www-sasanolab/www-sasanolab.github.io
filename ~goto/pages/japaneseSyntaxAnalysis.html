@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Goto - Japanese Syntax Analysis</title>
+    <link rel="Stylesheet" href="../style.css" />
+    <link rel="Stylesheet" href="styleOfLinkList.css" />
+    <script type="text/javascript" src="../js/prototype.js"></script>
+    <script type="text/javascript" src="../js/processing.js"></script>
+    <script type="text/javascript" src="../js/jkl-parsexml.js"></script>
+    <script type="text/javascript" src="../js/productionParser.js"></script>
+    <script type="text/javascript" src="../js/binary_tree.js"></script>
+    <script type="text/javascript">
+        var terminalSymbols = ["形容詞", "形容動詞", "感動詞", "副詞", "連体詞", "接続詞", "接頭辞", "接尾辞", "名詞句", "動詞", "助詞", "助動詞", "特殊"];
+
+        //Main
+        function analyze() {
+            //Firefox(Gecko engine)以外では実行しない
+            if (!Prototype.Browser.Gecko) {
+                alert("This program runs only on firefox.");
+                return;
+            }
+
+            //形態素解析
+            var morphemes = morphologicalAnalysis($('sentence').value);
+
+            //構文規則を読み込み
+            var productionRules = parseProduction($('syntax').value);
+
+            //CYK構文解析
+            var cykTable = cyk(morphemes, productionRules);
+
+            var parent = $('tree');
+
+            //remove all children
+            while (parent.hasChildNodes()) parent.removeChild(parent.firstChild);
+
+            //show graph
+            for (var i = 0, trees = cykTable[0][cykTable.length - 1]; i < trees.length; i++) parent.appendChild(visualizeTree(trees[i]));
+
+            showCykTable(cykTable, morphemes);
+        }
+
+        //構文解析
+        function cyk(morphemes, productionRules) {
+
+            var n = morphemes.length || 0;
+            var r = terminalSymbols.length;
+
+            if (n <= 1) return [];
+
+            //表を作成。表の各要素は配列
+            var P = new Array(n);
+            for (var i = 0; i < n; i++) {
+                P[i] = new Array(n);
+                for (var j = 0; j < n; j++) P[i][j] = [];
+            }
+
+            //表を形態素で初期化
+            for (var i = 0; i < n; i++) 
+                P[i][i].push(node(morphemes[i].pos, node(morphemes[i].surface, null, null), null));
+
+            //CYK表のあるセルについて全ての組合わせを調べる関数
+            var forAllCombination = function (mi, mj) {
+                for (var x = mi; x < mj; x++)
+                    for (var lhs in productionRules)
+                        for (var rn = 0; rn < productionRules[lhs].length; rn++) {
+                            //チョムスキー標準形なので必ず右辺は2個以下
+                            var rhs_0 = productionRules[lhs][rn][0];
+                            var rhs_1 = productionRules[lhs][rn][1] || ""; //if form of production rule is 'A -> a' then rhs_1 = "".
+
+                            //複数の結果を持っている場合それら全ての組合わせを試す
+                            for (var s = 0; s < P[mi][x].length; s++)
+                                for (var t = 0; t < P[x + 1][mj].length; t++)
+                                    //適用できる規則があれば還元
+                                    if ((P[mi][x][s].value == rhs_0) && (P[x + 1][mj][t].value == rhs_1 || rhs_1 == "")) 
+                                        P[mi][mj].push(node(lhs, P[mi][x][s], P[x + 1][mj][t]));
+                                    
+                        }
+            };
+
+            //P[i][i+j]のセルについて全ての組合わせを調べる
+            for (var i = 1; i < n; i++)
+                for (var j = 0; j < n - i; j++) forAllCombination(j, i + j);
+
+            return P;
+        }
+
+
+        //形態素解析
+        function morphologicalAnalysis(text) {
+            //リクエストの作成
+            var http = new JKL.ParseXML("../cgi/morphologicalAnalysis.cgi", "text=" + encodeURIComponent(text));
+
+            //リクエストの送信とXML解析
+            var data = (http.parse()).ResultSet.ma_result.word_list.word;
+
+            //名詞を名詞句にリネーム
+            for (var i = 0; i < data.length; i++)
+                if (data[i].pos == "名詞") data[i].pos = "名詞句";
+            
+            return data;
+        }
+
+        //入力領域（構文規則とテキスト）の表示切替
+        function changeInputArea(target) {
+            if (target == 'syntax') {
+                $('syntax_div').style.display = 'block';
+                $('sentence').style.display = 'none';
+            } else {
+                $('syntax_div').style.display = 'none';
+                $('sentence').style.display = 'block';
+            }
+        }
+
+        
+        //CYKの解析表の表示
+        function showCykTable(cykTable, morphemes) {
+
+            var table = document.createElement("table");
+            var tbody = document.createElement("tbody");
+            var tr, td;
+
+            tr = document.createElement("tr");
+            tr.appendChild(document.createElement("td"));
+            for (var k = 0; k < morphemes.length; k++) {
+                td = document.createElement("td");
+                td.appendChild(document.createTextNode(morphemes[k].surface));
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+
+            for (var i = 0; i < cykTable.length; i++) {
+                tr = document.createElement("tr");
+                td = document.createElement("td");
+                td.appendChild(document.createTextNode(morphemes[i].surface));
+                tr.appendChild(td);
+                for (var j = 0; j < cykTable[i].length; j++) {
+                    td = document.createElement("td");
+
+                    td.appendChild(document.createTextNode((function () {
+                        var pos = [];
+                        for (var k = 0; k < cykTable[i][j].length; k++) {
+                            pos.push(cykTable[i][j][k].value);
+                        }
+                        return pos.join(", ");
+                    })()));
+                    tr.appendChild(td);
+                }
+                tbody.appendChild(tr);
+            }
+            table.appendChild(tbody);
+            $('cykTable').innerHTML = "";
+            $('cykTable').appendChild(table);
+        }
+    </script>
+</head>
+<body>
+    <div id="container">
+        <div id="header">
+            <h1>
+                <a href="../">Goto</a> - <a href="./japaneseSyntaxAnalysis.html">Japanese Syntax Analysis</a></h1>
+            <ul id="navi">
+                <li><a href="/">SIC</a></li>
+            </ul>
+        </div>
+        <div id="content">
+            <div class="set">
+                <h2>
+                    Japanese Syntax Analysis</h2>
+                <div class="set-header">
+                    2010/05/11
+                </div>
+                <div class="set-body">
+                    <p>
+                        自然言語処理システム特論の課題で作りました。</p>
+                    <ul>
+                        <li><a href="http://en.wikipedia.org/wiki/CYK_algorithm">CYK法</a>による日本語構文解析<br />
+                            (This script do Japanese syntax analysis by CYK algorithm which is for natural
+                            language parsing)</li>
+                        <li>形態素解析はYahooのテキスト解析APIを利用
+                            <br />
+                            (This script uses the Yahoo Web API for morphological analysis.)</li>
+                        <li>構文規則を簡単に書き換え可能<br />
+                            (We can rewrite production rules easily. Production rules has to be written in <a
+                                href="http://en.wikipedia.org/wiki/Chomsky_normal_form">Chomsky normal form</a>.
+                            )</li>
+                        <li>結果をグラフィカルに表示<br />
+                            (Results of parsing are shown as figure. )</li>
+                        <li>デフォの構文規則が弱いので大抵の文は解析に失敗するよ<br />
+                            (There are many sentences that cannot be parsed since default syntax rules are not
+                            enough)</li>
+                    </ul>
+                    <hr />
+                    <h4>
+                        Input</h4>
+                    <label>
+                        <input onclick="changeInputArea('sentence');" type="radio" name="tab" checked="checked" />Sentence</label>
+                    <label>
+                        <input onclick="changeInputArea('syntax');" type="radio" name="tab" />Syntax</label>
+                    <input type="button" onclick="analyze()" value="Parse!" />
+                    <div id="syntax_div" style="display: none;">
+                        品詞(part of speech):形容詞,形容動詞,感動詞,副詞,連体詞,接続詞,接頭辞,接尾辞,名詞句,動詞,助詞,助動詞,特殊
+                        <textarea id="syntax" rows="10" cols="100" class="wide">
+後置詞句->名詞句 助詞
+名詞句->形容詞 名詞句
+名詞句->動詞句 名詞句
+動詞句->動詞 助動詞
+動詞句->後置詞句 動詞句
+動詞句->副詞 動詞句</textarea>
+                    </div>
+                    <textarea style="display: block;" id="sentence" rows="10" cols="100" class="wide">私は図書館で買った本を読んだ</textarea>
+                    <br />
+                    例：アマゾンで買った分厚い本を売ったことで得たお金で遊んだ
+                    <hr />
+
+                    <div id="cykTable">
+                    </div>
+                    <div id="tree">
+                    </div>
+                    <p>
+                        Yahoo形態素解析では「昨日」が副詞にならないため授業の例では上手くいきません。<br />
+                        形態素解析の結果、形態素が1個以下の場合は解析を行いません。この実装の仕様です。<br />
+                        英語は留学生への説明用に追加しました。<br />
+                        あんまりグラフがでかくなると線が被ります。手抜きです。すいません。
+                    </p>
+                    <h4>
+                        外部ファイルとか(external files and using library)</h4>
+                    <ul>
+                        <li><a href="../js/productionParser.js">productionParser.js</a>:構文規則の読み込む簡易パーサ(production
+                            rule scanner)</li>
+                    </ul>
+                    <ul>
+                        <li>processing.js: Graphics library for Canvas element of HTML5</li>
+                        <li><a href="http://www.kawa.net/works/js/jkl/parsexml.html">JKL.ParseXML: XML parsing
+                            library</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

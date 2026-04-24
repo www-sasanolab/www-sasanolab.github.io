@@ -1,0 +1,178 @@
+@charset "shift-jis";
+*{ 
+  margin:0;
+  padding:0;
+}
+
+html,body{
+  height: 100%;
+  width: 100%;
+}
+
+#container
+{
+  
+  min-width: 600px;
+  background-color: #dda;
+  border: 2px solid #bb8;
+  color: #449;
+  min-height:100%;
+  margin: 0 auto;
+}
+
+
+#header{
+  width: auto;
+
+  margin: 0;
+  border-bottom: 3px dotted #bb8;
+
+  padding: 10px;
+  
+}
+
+
+ul#navi{
+  margin: 0px;
+  padding: 0px;
+  width: 100%;
+}
+
+#navi li{
+  width: 90px;
+  display: inline-block;
+  /display: inline;
+  /zoom: 1;
+  margin: 0 3px;
+  list-style-type: none;
+  list-style-image:none;
+}
+#navi li a
+{
+    color: inherit;
+    text-decoration: none;
+}
+
+#navi li a:hover
+{
+    color: Red;
+    text-decoration:underline;
+}
+
+
+#navi li a:before
+{
+    content:">>";
+}
+
+#content{
+  padding: 10px;
+}
+
+h1 a,h1 a:visited{
+  color: #944;
+  text-decoration:none;
+}
+
+h1 a:hover{
+  text-decoration:underline;
+}
+ 
+.set{
+  border: 2px solid #944;
+  border-top: 10px solid #944;
+  -moz-border-radius: 15px;    /* âEè„ÇæÇØäpä€ */  
+  -webkit-border-radius:15px;    /* ç∂è„ÇæÇØäpä€ */
+  
+  margin-bottom: 10px;
+}
+
+.set h2{
+  font-size: 20px;
+  font-weight:bold;
+  background-color: #944;
+  color: white;
+  padding: 3px;
+  padding-left: 5px;
+  padding-bottom: 10px;
+}
+.set h2:before
+{
+    content:"Å@";
+    width: 25px;
+    margin-top:0px;
+    padding-top:0px;
+    display:inline-block;
+    background-image: url('./images/ministar.png');
+    background-repeat:no-repeat;
+}
+
+.set-header{
+  text-align:right;
+  padding-right: 5px;
+  font-weight: 0.7em;
+}
+
+.set-body{
+  padding: 5px;
+  padding-bottom: 10px;
+  padding-left: 15px;
+}
+
+.set-body a
+{
+    color: #005;
+}
+.set-body a:hover
+{
+    color: red;
+}
+
+.set-body li{
+    margin-left: 20px;
+    margin-top: 5px;
+    margin-bottom:5px;
+}
+
+.set-body p{
+    padding: 10px;
+    width: 70%;
+}
+
+hr
+{
+    
+    border: 1px solid #944;
+    margin: 5px 0;
+}
+
+h4
+{
+    display:inline-block;
+}
+
+
+/*--------------------*/
+textarea.wide
+{
+    width: 90%;
+    font-size: 12px;
+    height: 200px;
+    background-color: #cc9;
+}
+
+
+
+        input[type="button"]
+        {
+            font-weight: bold;
+            padding: 3px;
+            color:#866;
+            font-size: 17px;
+        }
+        
+        input[type="button"]:hover
+        {
+
+            color:#222;
+        }

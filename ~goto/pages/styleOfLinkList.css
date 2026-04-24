@@ -1,0 +1,51 @@
+        table
+        {
+            border: 1px solid;
+            margin: 10px auto;
+        }
+        
+        td
+        {
+            width: 80px;
+            border: 1px #944 solid;
+            text-align: center;
+            padding: 2px;
+            color: green;
+        }
+        a
+        {
+            text-decoration: none;
+            color: green;
+        }
+        a:visited
+        {
+            color: green;
+        }
+        a:hover
+        {
+            text-decoration: underline;
+        }
+        #head
+        {
+            padding: 0 2px;
+        }
+        .sample
+        {
+            display: inline-block;
+
+            width: 70px;
+            height: 20px;
+            color: Green;
+            text-align: center;
+            margin: 0 2px;
+            border: 1px solid #944;
+        }
+        .failure
+        {
+            background-color: #99c;
+        }
+        .success
+        {
+            background-color: #ccf;
+        }
+        

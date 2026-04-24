@@ -1,0 +1,41 @@
+<html>
+<head>
+<title>Kmyacconv - くみゃっこんぶ</title>
+<!--あいうえお-->
+<script type="text/javascript" src="conv.js"></script>
+<script type="text/javascript" >
+<!--
+    var $ = function (id) { return document.getElementById(id); };
+    var println = function(str)$('output').innerHTML += str +"<br>";
+    function main() {
+        var parserTable = ParserTable.readFromText($('input').value);
+
+        parserTable.collectTokens();
+
+	$('rules').innerHTML = parserTable.rulesToHTML();
+        $('code').value = parserTable.make();
+    }
+
+//-->
+</script>
+</head>
+<body>
+<h1>Kmyacconv - くみゃっこんぶ</h1>
+<p>
+kmyaccの出力するy.outputからEmacs Lisp用の構文解析表へと変換するモノ。
+アクション表とGOTO表は今のところごっちゃ。
+</p>
+↓ここにy.outputの中身を貼りつけて押す→
+<input type="button" onclick="main();" value="do" /><br />
+<textarea id="input" style="width: 50%; height:200px;">
+
+</textarea>
+<hr />
+<h2>還元規則</h2>
+<div id="rules"></div>
+<h2>Emacs Lispのソースコード</h2>
+<textarea id="code" style="width: 50%; height:400px;"></textarea>
+<div id="output" style="font-size: 20px;"></div>
+
+</body>
+</html>

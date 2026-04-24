@@ -1,0 +1,145 @@
+
+use Socket;
+use FileHandle;
+use MIME::Base64;
+#require('BASE64');
+
+sub getHTTP{
+	local $\ = "";
+
+	my %arg = ( @_ );
+	my $data;
+	my ( $uri, $proxy_address, $proxy_port, $http_version, $user_id, $password,
+		$proxy_user_id, $proxy_password, $referrer, $referer, $agent ) =
+	(
+		$arg{URL}           || $_[0],
+		$arg{Proxy}         || "",
+		$arg{ProxyPort}     || "",
+		$arg{HTTP}          || "1.1",
+		$arg{UserID}        || "",
+		$arg{Password}      || "",
+		$arg{ProxyUserID}   || "",
+		$arg{ProxyPassword} || "",
+		$arg{Referrer}      || "",
+		$arg{Referer}       || "",
+		$arg{UserAgent}     || "HTTP client version 1.02 (www.kasai.fm)"
+	);
+
+	my ( $scheme, $domain, $server_address, $server_port, $path );
+	my ( $target_address, $target_port, $target_path, $target_ip );
+
+
+######### URI parsing
+
+	### retrieve scheme ( "http://" )
+	
+	if ( $uri =~ s!^(\w+?)://!! ){
+		$scheme = $1;
+		
+		return ("",
+			"Can't handle '$scheme'. Only 'http' is possible"
+		) if ( $scheme !~ /^http$/i );
+	}
+	else{
+		$scheme = 'http';
+	}
+
+
+	### retrieve domain, port and path ( "hogehoge:8080/foo/bar.html" )
+	
+	( $domain, $path ) = split( /\//, $uri, 2 );
+	( $server_address, $server_port ) = split( /:/, $domain, 2 );
+	
+	$server_address ||= "localhost";
+	$server_port    ||= getservbyname( $scheme, "tcp" );
+
+
+	### complete info about your proxy server
+
+	if ( $proxy_address and !$proxy_port ){
+		( $proxy_port ) = $proxy_address =~ /:(\d+)/;
+		
+		return ("",
+			"Proxy port is undefined.".
+			"Specify 'ProxyPort'=>8080 or 'Proxy'=>'${proxy_address}:8080'"
+		) unless ( $proxy_port );
+	}
+
+
+	### switch arguments according to if you use a proxy server
+	
+	( $target_address, $target_port, $target_path ) = $proxy_address ?
+		(
+			$proxy_address,
+			$proxy_port,
+			"${scheme}://${server_address}:${server_port}/${path}"
+		) :
+		(
+			$server_address,
+			$server_port,
+			"/$path"
+		);
+
+
+ ######### SOCKET (create)
+ 
+	$target_ip    = inet_aton( $target_address ) || return ("", "Can't connect to $target_address" );
+	$sock_address = pack_sockaddr_in( $target_port, $target_ip );
+	
+	socket(SOCKET, PF_INET, SOCK_STREAM, 0) || return ("", "Can't create socket on $target_address");
+
+
+ ######### SOCKET (connect)
+ 
+	connect(SOCKET, $sock_address) or return ("", "Can't connect socket on $sock_address");
+	autoflush SOCKET (1);
+
+
+ ######### Send HTTP GET request
+ 
+	if ( $http_version eq "1.1" ) {
+		print SOCKET "GET $target_path HTTP/1.1\n";
+		print SOCKET "Host: $target_address\n";
+		print SOCKET "Connection: close\n";
+	}
+	else {
+		print SOCKET "GET $target_path HTTP/1.0\n";
+	}
+
+	if ( $user_id ){
+		print SOCKET "Authorization: Basic\n ";
+		print SOCKET &base64'b64encode("${user_id}:${password}")."\n";
+	}
+
+	if ( $proxy_user_id ){
+		print SOCKET "Proxy-Authorization: Basic\n ";
+		print SOCKET &base64'b64encode("${proxy_user_id}:${proxy_password}")."\n";
+	}
+
+	print SOCKET "User-Agent: $agent\n"  if ( $agent    );
+	print SOCKET "Referrer: $referrer\n" if ( $referrer );
+	print SOCKET "Referer: $referer\n"   if ( $referer  );
+
+	print SOCKET "Accept: text/html; */*\n";
+	print SOCKET "\n";
+
+
+	######### Receive HTTP response via SOCKET
+
+	while ( <SOCKET> ) {
+		chomp;
+		$data .= "$_\n";
+	}
+
+
+	######### SOCKET (close); take down the session
+	
+	close(SOCKET);
+
+
+	######### return
+
+	return ($data, "");
+}
+
+1;

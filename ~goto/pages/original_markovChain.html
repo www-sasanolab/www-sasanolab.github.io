@@ -1,0 +1,159 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>Goto - Link checker</title>
+    <link rel="Stylesheet" href="../style.css" />
+    <script type="text/javascript" src="../js/prototype.js"></script>
+    <script type="text/javascript" src="../js/tiny_segmenter.js"></script>
+    <script type="text/javascript">
+        function showStatus(mes) {
+            $('status').innerHTML = mes;
+        }
+
+        function debug(mes) {
+            $('debug').value += mes + "\n";
+        }
+
+        function generateText() {
+        
+            var generator = new TextGenerator();
+            generator.makeMarkovChain($('inputText').value.split("\n").join(""));
+
+
+            $('outputText').value = generator.makeSentence();
+            generator.showDictionary();
+        }
+
+        var TextGenerator = function () {
+            var dictionary = {};
+            var BOS = '--BEGIN--';
+            var EOS = '--END--';
+            $('debug').value = "";
+            $('dictionary').value = "";
+
+            var removeNouseCharacter = function (a) {
+                var resultArray = [];
+                var re = new RegExp("[ 　「」)(（）]", "i");
+
+                for (var i = 0; i < a.length; i++)
+                    if (!(a[i].match(re))) resultArray.push(a[i]);
+
+                return resultArray;
+            }
+
+            this.makeMarkovChain = function (inputSentence) {
+
+                var segments = (new TinySegmenter()).segment(inputSentence);
+                segments = removeNouseCharacter(segments);
+
+                for (var previousSegment = EOS, i = 0; i < segments.length; i++) {
+
+                    if (previousSegment == EOS) {
+                        //new sentence
+                        previousSegment = segments[i];
+                        add(BOS, segments[i]);
+                    } else {
+
+                        if (segments[i] == "。" || segments[i] == "。　") {
+                            //end sentence
+                            add(previousSegment, segments[i]);
+                            add(segments[i], EOS);
+                            previousSegment = EOS;
+                        } else {
+                            //continue sentence    
+                            add(previousSegment, segments[i]);
+                            previousSegment = segments[i];
+                        }
+                        if (segments[i + 1] == undefined) {
+                            //last segment
+                            add(segments[i], EOS);
+                        }
+                    }
+                }
+            };
+            var add = function (key, value) {
+                if (dictionary[key] == undefined) {
+                    dictionary[key] = {};
+                }
+                if (dictionary[key][value] == undefined) dictionary[key][value] = 1;
+                else dictionary[key][value]++;
+            };
+
+            var next = function (key) {
+                var list = [];
+                for (var o in dictionary[key]) for (var i = 0; i < dictionary[key][o]; i++) list.push(o);
+                return list[Math.floor(list.length * Math.random())];
+            }
+
+
+            this.makeSentence = function () {
+                var resultSentence = "";
+
+                for (var i = 0, previousSegment = BOS; i < 500; i++) {
+                    previousSegment = next(previousSegment);
+                    if (previousSegment == EOS) break;
+                    resultSentence += previousSegment;
+                }
+                return resultSentence;
+            }
+
+            this.showDictionary = function () {
+                var addLine = function (mes) { $('dictionary').value += mes + "\n"; };
+                var length, str, result = "";
+
+                for (var a in dictionary) {
+                    length = 0; str = "";
+                    for (var b in dictionary[a]) {
+                        str += "  -> " + b + " :" + dictionary[a][b] + "\n";
+                        length++
+                    }
+                    result += "■" + a + ": " + length + "\n" + str + "\n";
+
+                }
+                addLine(result);
+            }
+
+        };
+
+    </script>
+</head>
+<body>
+    <div id="container">
+        <div id="header">
+            <h1>
+                <a href="../">Goto</a> - <a href="./linkList.html">Text generater by Markov chain</a></h1>
+            <ul id="navi">
+                <li><a href="/">SIC</a></li>
+                <li><a href="/~m110057/">Top</a></li>
+            </ul>
+        </div>
+        <div id="content">
+            <div class="set">
+                <h2>
+                    Link checker</h2>
+                <div class="set-header">
+                    created at 2010/05/13
+                </div>
+                <div class="set-body">
+                    <p>
+                        与えられたテキストからマルコフ連鎖によりテキスト生成
+                    </p>
+                    <hr />
+                    <textarea id="inputText" rows="10" cols="100" class="wide"></textarea>
+                    <input type="button" value="Generate" onclick="generateText();" />
+                    <span id="status"></span>
+                    <hr />
+                    <textarea id="outputText" rows="10" cols="100" class="wide"></textarea>
+                    <hr />
+                    Dictionary<br />
+                    <textarea id="dictionary" rows="10" cols="100" class="wide"></textarea>
+                    <hr />
+
+                    Debug<br />
+                    <textarea id="debug" rows="10" cols="100" class="wide"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,423 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>Goto - Japanese Syntax Analysis</title>
+    <link rel="Stylesheet" href="../style.css" />
+    <link rel="Stylesheet" href="styleOfLinkList.css" />
+    <script type="text/javascript" src="../js/prototype.js"></script>
+    <script type="text/javascript" src="../js/processing.js"></script>
+    <script type="text/javascript" src="../js/jkl-parsexml.js"></script>
+    <script type="text/javascript" src="../js/productionParser.js"></script>
+    <script type="text/javascript">
+        var terminalSymbols = ["形容詞", "形容動詞", "感動詞", "副詞", "連体詞", "接続詞", "接頭辞", "接尾辞", "名詞句", "動詞", "助詞", "助動詞", "特殊"];
+
+        function analyze() {
+
+            //get morphemes
+            var morphemes = morphologicalAnalysis($('sentence').value);
+            var productionRules = parseProduction($('syntax').value);
+
+            showResultOfMA(morphemes);
+
+            var trees = cyk(morphemes, productionRules);
+
+            var parent = $('tree');
+            parent.innerHTML = "";
+            for (var i = 0; i < trees.length; i++) {
+                if (trees[i].pos == "×") break;
+                parent.appendChild(visualizeTree(trees[i]));
+                parent.appendChild(document.createElement("br"));
+            }
+
+        }
+
+
+        function node(pos, left, right) {
+            return {
+                pos: pos,
+                left: left,
+                right: right
+            };
+        }
+
+        function node2string(node) {
+            if (node.left) {
+                if (node.right) {
+                    return "(" + node.pos + " " + node2string(node.left) + ", " + node2string(node.right) + ")";
+                } else {
+                    return "(" + node.pos + " " + node2string(node.left) + ")";
+                }
+            } else return node.pos;
+
+
+        }
+
+        function cyk(morphemes, productionRules) {
+
+
+            var n = morphemes.length || 0;
+            var r = terminalSymbols.length;
+
+            if (n <= 1) return [];
+
+            //init. Let P[n,n,r] = false 
+            var P = new Array(n);
+
+            for (var i = 0; i < n; i++) {
+                P[i] = new Array(n);
+                for (var j = 0; j < n; j++) P[i][j] = [];
+            }
+
+
+            //P[i,1,j] = true;
+            for (var i = 0; i < n; i++) {
+                P[i][i].push(node(morphemes[i].pos, node(morphemes[i].surface, null, null), null));
+            }
+
+            var temp = "";
+
+            var forAllCombination = function (mi, mj) {
+
+                temp += "■for P[" + mi + ", " + mj + ")\n";
+                for (var x = mi; x < mj; x++) {
+
+                    for (var lhs in productionRules)
+                        for (var rn = 0; rn < productionRules[lhs].length; rn++) {
+                            var rhs_0 = productionRules[lhs][rn][0];
+                            var rhs_1 = productionRules[lhs][rn][1] || ""; //if form of production rule is 'A -> a' then rhs_1 = "".
+
+                            //check whether P[mi,x]==rhs_0 && P[x+1,mj]==rhs_1
+                            for (var s = 0; s < P[mi][x].length; s++)
+                                for (var t = 0; t < P[x + 1][mj].length; t++)
+                                    if ((P[mi][x][s].pos == rhs_0) && (P[x + 1][mj][t].pos == rhs_1 || rhs_1 == "")) {
+                                        temp += " reduced with the rule " + lhs + " -> " + rhs_0 + " " + rhs_1;
+
+                                        P[mi][mj].push(node(lhs, P[mi][x][s], P[x + 1][mj][t]));
+                                        temp += "●\n";
+
+                                    }
+
+                        };
+                }
+
+                if (P[mi][mj].length == 0) P[mi][mj].push(node("×", null, null));
+
+            };
+
+            for (var i = 1; i < n; i++) {
+                for (var j = 0; j < n - i; j++)
+                    forAllCombination(j, i + j);
+
+
+                temp += "######################################\n";
+            }
+            //P[j,i+j]            		
+            //write the algorithm cyk here.
+
+            var parseTrees = P[0][n - 1];
+            for (var i = 0; i < parseTrees.length; i++) {
+                temp += node2string(parseTrees[i]) + "\n\n";
+            }
+
+            $('resultOfSyntaxAnalysis').value = temp;
+
+            showCykTable(P, morphemes);
+
+            return parseTrees;
+
+        }
+
+        function showResultOfMA(morphemes) {
+            var str = "";
+
+            for (var i = 0; i < morphemes.length; i++)
+                str += morphemes[i].surface + ": " + morphemes[i].pos + "\n";
+
+            $('resultOfMorphologicalAnalysis').value = str;
+        }
+
+        function morphologicalAnalysis(text) {
+
+            var url = "../cgi/morphologicalAnalysis.cgi";
+            //var url = "./test-data.xml";
+            var query = "text=" + encodeURIComponent(text);
+
+            var http = new JKL.ParseXML(url, query);
+
+            //post and parse
+            var data = (http.parse()).ResultSet.ma_result.word_list.word;
+
+            //rename
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].pos == "名詞") data[i].pos = "名詞句";
+            }
+
+            return data;
+        }
+
+        function changeInputArea(target) {
+            if (target == 'syntax') {
+                $('syntax_div').style.display = 'block';
+                $('sentence').style.display = 'none';
+            } else {
+                $('syntax_div').style.display = 'none';
+                $('sentence').style.display = 'block';
+            }
+        }
+
+        function changeOutputArea(target) {
+            if (target == 'resultOfSyntaxAnalysis') {
+                $('resultOfMorphologicalAnalysis').style.display = 'block';
+                $('resultOfSyntaxAnalysis').style.display = 'none';
+            } else {
+                $('resultOfMorphologicalAnalysis').style.display = 'none';
+                $('resultOfSyntaxAnalysis').style.display = 'block';
+            }
+        }
+
+        function treeDepth(n) {
+            var l, r;
+            if (n.left) {
+                l = treeDepth(n.left);
+                if (n.right) {
+
+                    r = treeDepth(n.right);
+                    return (l < r ? r : l) + 1;
+                }
+                return l + 1;
+            } else return 1;
+        }
+
+        function treeWidth(t) {
+            var l, r;
+            if (t.left) {
+                l = treeDepth(t.left);
+                if (t.right) {
+
+                    r = treeDepth(t.right);
+                    return l + r;
+                }
+                return l;
+            } else return 1;
+        }
+
+        function maxX(tree) {
+            var l, r;
+            if (tree.left) {
+                l = maxX(tree.left);
+                if (tree.right) {
+                    r = maxX(tree.right);
+                    return l < r ? r : l;
+                } else return l;
+            }
+            return tree.x;
+        }
+
+        function minY(tree) {
+            if (tree.right)
+                return tree.left.y < tree.right.y ? tree.left.y : tree.right.y;
+            else return tree.left.y;
+        }
+
+        function drawTree(p, tree, x, y) {
+            var leftChildPos = null;
+            var rightChildPos = null;
+
+            //size of box.
+            var box_w = 70;
+            var box_h = 20;
+
+            if (tree.left != null) {
+                //draw left child
+                drawTree(p, tree.left, x, y);
+
+                //draw right child if it exist
+                tree.right && drawTree(p, tree.right, maxX(tree.left) + 80, y);
+
+                var mx = tree.right ? (tree.left.x + (tree.right.x - tree.left.x) / 2) : tree.left.x;
+                var my = minY(tree) - 35;
+                tree.x = mx;
+                tree.y = my;
+
+                //draw lines and boxes
+                p.fill(255);
+                p.line(mx + box_w / 2, my + box_h, tree.left.x + box_w / 2, tree.left.y);
+                tree.right && p.line(mx + box_w / 2, my + box_h, tree.right.x + box_w / 2, tree.right.y);
+
+                p.rect(mx, my, box_w, box_h);
+                p.fill(0);
+                p.text(tree.pos, mx + 5, my + 15);
+            }
+
+
+            //if tree represents terminal symbol then come here
+            if ((tree.left == null) && (tree.right == null)) {
+
+                //remember position in this tree
+                tree.x = x;
+                tree.y = y;
+
+                //draw 
+                p.fill(220);
+                p.rect(x, y, 60, 20);
+                p.fill(192, 64, 64);
+                p.text(tree.pos, x + 5, y + 15);
+            }
+        }
+
+        function visualizeTree(tree) {
+            var canvas = document.createElement("canvas");
+
+
+            var p = Processing(canvas);
+            var width = treeDepth(tree);
+            var height = treeWidth(tree);
+
+            p.setup = function () {
+                //precomputation to calculate the size of parse tree
+                drawTree(p, tree, 5, height * 30);
+
+                this.size(maxX(tree) + 100, 35 * height);
+
+                //redraw
+                this.background(192, 192, 160);
+                drawTree(p, tree, 5, height * 30);
+            };
+
+
+            //start drawing
+            p.init();
+            return canvas;
+        }
+
+        function showCykTable(cykTable, morphemes) {
+
+            var table = document.createElement("table");
+            var tbody = document.createElement("tbody");
+            var tr, td;
+
+            tr = document.createElement("tr");
+            tr.appendChild(document.createElement("td"));
+            for (var k = 0; k < morphemes.length; k++) {
+                td = document.createElement("td");
+                td.appendChild(document.createTextNode(morphemes[k].surface + " (" + k + ")"));
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+
+            for (var i = 0; i < cykTable.length; i++) {
+                tr = document.createElement("tr");
+                td = document.createElement("td");
+                td.appendChild(document.createTextNode(morphemes[i].surface + " (" + i + ")"));
+                tr.appendChild(td);
+                for (var j = 0; j < cykTable[i].length; j++) {
+                    td = document.createElement("td");
+
+                    td.appendChild(document.createTextNode((function () {
+                        var pos = [];
+                        for (var k = 0; k < cykTable[i][j].length; k++) {
+                            pos.push(cykTable[i][j][k].pos);
+                        }
+                        return pos.join(", ");
+                    })()));
+                    tr.appendChild(td);
+                }
+                tbody.appendChild(tr);
+            }
+            table.appendChild(tbody);
+            $('cykTable').innerHTML = "";
+            $('cykTable').appendChild(table);
+        }
+    </script>
+</head>
+<body>
+    <div id="container">
+        <div id="header">
+            <h1>
+                <a href="../">Goto</a> - <a href=".//japaneseSyntaxAnalysis.html">Japanese Syntax Analysis</a></h1>
+            <ul id="navi">
+                <li><a href="/">SIC</a></li>
+            </ul>
+        </div>
+        <div id="content">
+            <div class="set">
+                <h2>
+                    Japanese Syntax Analysis</h2>
+                <div class="set-header">
+                    2010/05/11
+                </div>
+                <div class="set-body">
+                    <p>
+                        自然言語処理システム特論の課題で作りました。</p>
+                    <ul>
+                        <li><a href="http://en.wikipedia.org/wiki/CYK_algorithm">CYK法</a>による日本語構文解析<br />(This script
+                            do syntax analysis for Japanese by CYK algorithm which is for natural language parsing)</li>
+                        <li>形態素解析はYahooのテキスト解析APIを利用 <br />(using Yahoo Web API for morphological analysis)</li>
+                        <li>構文規則を簡単に書き換え可能<br /> (We can rewrite production rules easily. Production rules has to
+                            be written in <a href="http://en.wikipedia.org/wiki/Chomsky_normal_form">Chomsky normal
+                                form</a>. )</li>
+                        <li>結果をグラフィカルに表示(Firefoxのみ)<br /> (A result of parsing is shown as graph. (firefox only))</li>
+                        <li>デフォの構文規則が弱いので大抵の文は解析に失敗するよ<br /> (There are many sentences that cannot be parsed since
+                            default syntax rules are not enough)</li>
+                    </ul>
+                    <hr />
+                    <h4>
+                        Input</h4>
+                    <label>
+                        <input onclick="changeInputArea('sentence');" type="radio" name="tab" checked="checked" />Sentence</label>
+                    <label>
+                        <input onclick="changeInputArea('syntax');" type="radio" name="tab" />Syntax</label>
+                    <input type="button" onclick="analyze()" value="Parse!" />
+                    <div id="syntax_div" style="display: none;">
+                        品詞(part of speech):形容詞,形容動詞,感動詞,副詞,連体詞,接続詞,接頭辞,接尾辞,名詞句,動詞,助詞,助動詞,特殊
+                        <textarea id="syntax" rows="10" cols="100" class="wide">
+後置詞句->名詞句 助詞
+名詞句->形容詞 名詞句
+名詞句->動詞句 名詞句
+動詞句->動詞 助動詞
+動詞句->後置詞句 動詞句
+動詞句->副詞 動詞句</textarea>
+                    </div>
+                    <textarea style="display: block;" id="sentence" rows="10" cols="100" class="wide">私は図書館で買った本を読んだ</textarea>
+                    <br />
+                    例：アマゾンで買った分厚い本を売ったことで得たお金で遊んだ
+                    <hr />
+                    <h4>
+                        Output
+                    </h4>
+                    <label>
+                        <input onclick="changeOutputArea('resultOfMorphologicalAnalysis');" type="radio"
+                            name="tab_2" checked="checked" />Calculation Process</label>
+                    <label>
+                        <input onclick="changeOutputArea('resultOfSyntaxAnalysis');" type="radio" name="tab_2" />Morphological
+                        Analysis</label>
+                    <textarea style="display: none;" id="resultOfMorphologicalAnalysis" rows="10" cols="100"
+                        class="wide">形態素解析の結果</textarea>
+                    <textarea style="display: block;" id="resultOfSyntaxAnalysis" rows="10" cols="100"
+                        class="wide">構文解析の結果</textarea>
+                    <div id="cykTable">
+                    </div>
+                    <div id="tree">
+                    </div>
+                    <p>
+                        Yahoo形態素解析では「昨日」が副詞にならないため授業の例では上手くいきません。<br />
+                        形態素解析の結果、形態素が1個以下の場合は解析を行いません。この実装の仕様です。<br />
+                        あんまりグラフがでかくなると線が被ります。手抜きです。すいません。
+                    </p>
+                    <h4>
+                        外部ファイルとか(external files and using library)</h4>
+                    <ul>
+                        <li><a href="../js/productionParser.js">productionParser.js</a>:構文規則の読み込む簡易パーサ(production
+                            rule scanner)</li>
+                    </ul>
+                    <ul>
+                        <li>processing.js: Graphics library for Canvas element of HTML5</li>
+                        <li><a href="http://www.kawa.net/works/js/jkl/parsexml.html">JKL.ParseXML: XML parsing
+                            library</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

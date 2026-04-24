@@ -1,0 +1,149 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>Goto - Text generator by Markov Chain</title>
+    <link rel="Stylesheet" href="../style.css" />
+    <script type="text/javascript" src="../js/prototype.js"></script>
+    <script type="text/javascript" src="../js/tiny_segmenter.js"></script>
+    <script type="text/javascript">
+        function generateText() {
+        
+            var generator = new TextGenerator();
+            generator.makeMarkovChain($('inputText').value.split("\n").join(""));
+
+            $('outputText').value = generator.makeSentence();
+
+        }
+
+        var TextGenerator = function () {
+            var dictionary = {};
+            var BOS = '--BEGIN--';
+            var EOS = '--END--';
+ 
+            var removeNouseCharacter = function (a) {
+                var resultArray = [];
+                var re = new RegExp("[ 　「」)(（）]", "i");
+
+                for (var i = 0; i < a.length; i++) if (!(a[i].match(re))) resultArray.push(a[i]);
+
+                return resultArray;
+            }
+
+            this.makeMarkovChain = function (inputSentence) {
+
+                var segments = (new TinySegmenter()).segment(inputSentence);
+                segments = removeNouseCharacter(segments);
+
+                for (var previousSegment = EOS, i = 0; i < segments.length; i++) {
+
+                    if (previousSegment == EOS) {
+                        //new sentence
+                        previousSegment = segments[i];
+                        add(BOS, segments[i]);
+                    } else {
+
+                        if (segments[i] == "。" || segments[i] == "。　") {
+                            //end sentence
+                            add(previousSegment, segments[i]);
+                            add(segments[i], EOS);
+                            previousSegment = EOS;
+                        } else {
+                            //continue sentence    
+                            add(previousSegment, segments[i]);
+                            previousSegment = segments[i];
+                        }
+                        if (segments[i + 1] == undefined) {
+                            //last segment
+                            add(segments[i], EOS);
+                        }
+                    }
+                }
+            };
+            var add = function (key, value) {
+                if (dictionary[key] == undefined) dictionary[key] = {};
+
+                if (dictionary[key][value] == undefined) dictionary[key][value] = 1;
+                  else dictionary[key][value]++;
+            };
+
+            var next = function (key) {
+                var list = [];
+
+                for (var o in dictionary[key]) for (var i = 0; i < dictionary[key][o]; i++) list.push(o);
+
+                return list[Math.floor(list.length * Math.random())];
+            }
+
+
+            this.makeSentence = function () {
+                var resultSentence = "";
+
+                for (var i = 0, previousSegment = BOS; i < 500; i++) {
+                    previousSegment = next(previousSegment);
+                    if (previousSegment == EOS) break;
+                    resultSentence += previousSegment;
+                }
+                return resultSentence;
+            }
+
+        };
+
+    </script>
+</head>
+<body>
+    <div id="container">
+        <div id="header">
+            <h1>
+                <a href="../">Goto</a> - <a href="./markovChain.html">Text generater by Markov chain</a></h1>
+            <ul id="navi">
+                <li><a href="/">SIC</a></li>
+                <li><a href="/~m110057/">Top</a></li>
+            </ul>
+        </div>
+        <div id="content">
+            <div class="set">
+                <h2>
+                    Text generator by Markov chain</h2>
+                <div class="set-header">
+                    created at 2010/05/13
+                </div>
+                <div class="set-body">
+                    <p>
+                        マルコフ連鎖が面白そうだったので作ってみました。</p>
+                        
+                        <p>
+                        入力のテキストは新聞記事みたく句読点でしっかり区切られてるほうが望ましいです。
+                        句点を分の区切りとして認識しているので読点(、)はなくてもいいですが、句点（。）がないと微妙。
+                        ひとつも句点がないと入力した文章がひとつの文としてみなされるので、生成されるテキストの最初と最後は常に同じになっちゃいます。
+                    </p>
+                    <p>
+                        サンプルは太宰治の走れメロスのネタバレ部分。<a href="http://www.aozora.gr.jp/index.html" >青空文庫</a>より。
+                    </p>
+                    <hr />
+                    <textarea id="inputText" rows="10" cols="100" class="wide">
+「待て。その人を殺してはならぬ。メロスが帰って来た。約束のとおり、いま、帰って来た。」と大声で刑場の群衆にむかって叫んだつもりであったが、喉（のど）がつぶれて嗄（しわが）れた声が幽（かす）かに出たばかり、群衆は、ひとりとして彼の到着に気がつかない。すでに磔の柱が高々と立てられ、縄を打たれたセリヌンティウスは、徐々に釣り上げられてゆく。メロスはそれを目撃して最後の勇、先刻、濁流を泳いだように群衆を掻きわけ、掻きわけ、
+「私だ、刑吏！　殺されるのは、私だ。メロスだ。彼を人質にした私は、ここにいる！」と、かすれた声で精一ぱいに叫びながら、ついに磔台に昇り、釣り上げられてゆく友の両足に、齧（かじ）りついた。群衆は、どよめいた。あっぱれ。ゆるせ、と口々にわめいた。セリヌンティウスの縄は、ほどかれたのである。
+「セリヌンティウス。」メロスは眼に涙を浮べて言った。「私を殴れ。ちから一ぱいに頬を殴れ。私は、途中で一度、悪い夢を見た。君が若（も）し私を殴ってくれなかったら、私は君と抱擁する資格さえ無いのだ。殴れ。」
+　セリヌンティウスは、すべてを察した様子で首肯（うなず）き、刑場一ぱいに鳴り響くほど音高くメロスの右頬を殴った。殴ってから優しく微笑（ほほえ）み、
+「メロス、私を殴れ。同じくらい音高く私の頬を殴れ。私はこの三日の間、たった一度だけ、ちらと君を疑った。生れて、はじめて君を疑った。君が私を殴ってくれなければ、私は君と抱擁できない。」
+　メロスは腕に唸（うな）りをつけてセリヌンティウスの頬を殴った。
+「ありがとう、友よ。」二人同時に言い、ひしと抱き合い、それから嬉し泣きにおいおい声を放って泣いた。
+　群衆の中からも、歔欷（きょき）の声が聞えた。暴君ディオニスは、群衆の背後から二人の様を、まじまじと見つめていたが、やがて静かに二人に近づき、顔をあからめて、こう言った。
+「おまえらの望みは叶（かな）ったぞ。おまえらは、わしの心に勝ったのだ。信実とは、決して空虚な妄想ではなかった。どうか、わしをも仲間に入れてくれまいか。どうか、わしの願いを聞き入れて、おまえらの仲間の一人にしてほしい。」
+　どっと群衆の間に、歓声が起った。
+「万歳、王様万歳。」
+　ひとりの少女が、緋（ひ）のマントをメロスに捧げた。メロスは、まごついた。佳き友は、気をきかせて教えてやった。
+「メロス、君は、まっぱだかじゃないか。早くそのマントを着るがいい。この可愛い娘さんは、メロスの裸体を、皆に見られるのが、たまらなく口惜しいのだ。」
+　勇者は、ひどく赤面した。
+                    </textarea>
+                    <input type="button" value="Generate" onclick="generateText();" />
+                    <span id="status"></span>
+                    <hr />
+                    <textarea id="outputText" rows="10" cols="100" class="wide"></textarea>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

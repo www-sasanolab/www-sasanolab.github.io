@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>Goto - Link checker</title>
+    <link rel="Stylesheet" href="../style.css" />
+    <link rel="Stylesheet" href="styleOfLinkList.css" />
+    <script type="text/javascript" src="../js/prototype.js"></script>
+    <script type="text/javascript">
+        var max = 150;
+        var baseUrl = "http://www.sic.shibaura-it.ac.jp/~";
+        var urlList = [];
+
+
+        function showStatus(mes) { $('status').innerHTML = mes; }
+
+        //Exsample: zerofill(3,7) makes a string such a "007"
+        function zerofill(d, num) {
+            return (new Array(d).join("0")).substring(0, d - (num + "").length) + num;
+        }
+
+        //Update the table
+        function makeList() {
+            var header = $('head').value.toLowerCase();
+            var table = document.createElement("table");
+            var tbody = document.createElement('tbody');
+
+            //Initialize list
+            urlList = [];
+
+            for (var i = 1; i < max; ) {
+                var tr = document.createElement("tr");
+
+                for (var j = 0; j < 10; j++, i++) {
+                    var td = document.createElement("td");
+                    var anchor = document.createElement("a");
+                    var studentId = header + zerofill(3, i);
+
+                    //Set attributes of hyperlink
+                    anchor.setAttribute("href", baseUrl + studentId);
+                    anchor.setAttribute("target", "_blank");
+                    anchor.appendChild(document.createTextNode(studentId.toUpperCase()));
+
+                    td.appendChild(anchor);
+                    tr.appendChild(td);
+
+                    urlList.push({ url: (baseUrl + studentId), html: td });
+                }
+                tbody.appendChild(tr);
+            }
+            table.appendChild(tbody);
+            $('area').innerHTML = "";
+            $('area').appendChild(table);
+        }
+
+        //Start to check that the URL is available.
+        function beginCheckUrl() {
+            (function (loading) {
+                return function () {
+                    if (loading < 5) for (var i = loading; i < 5; i++, loading++) request(function () { loading-- });
+                    if (urlList.length > 0) setTimeout(arguments.callee, 100);
+                    showStatus((urlList.length) + "/" + max);
+                }
+            })(0)();
+        }
+
+        function request(decFunc) {
+            if (urlList.length == 0) return;
+            var req = urlList.shift();
+
+            var para = {
+                method: 'get',
+                onSuccess: (function (td, decFunc) {
+                    return function () {
+                        decFunc()
+                        td.style.backgroundColor = "#ccf";
+                    }
+                })(req.html, decFunc),
+                onFailure: (function (td, decFunc) {
+                    return function (d) {
+                        decFunc();
+                        td.style.backgroundColor = "#99c";
+                    }
+                })(req.html, decFunc)
+            };
+
+            req.html.style.background = "#bbd";
+            new Ajax.Request(req.url, para);
+        }
+
+        window.onload = function () {
+            makeList();
+        }
+    </script>
+</head>
+<body>
+    <div id="container">
+        <div id="header">
+            <h1>
+                <a href="../">Goto</a> - <a href="./linkList.html">Link checker</a></h1>
+            <ul id="navi">
+                <li><a href="/">SIC</a></li>
+                <li><a href="/~m110057/">Top</a></li>
+            </ul>
+        </div>
+        <div id="content">
+            <div class="set">
+                <h2>
+                    Link checker</h2>
+                <div class="set-header">
+                    2010/05/11
+                </div>
+                <div class="set-body">
+                    <p>
+                        とりあえず、恒例のリスト作るやつ作った。<br />
+                        リストを表示するだけじゃなくてページが公開状態になってるかも チェック出来るよ。<br />
+                        <br />
+                        IEだと崩れます。
+                    </p>
+                    <hr />
+                    <input type="text" value="L10" size="3" id="head" />
+                    <input type="button" value="MAKE LIST" onclick="makeList();" />
+                    <input type="button" value="CHECK!" onclick="beginCheckUrl();" id="urlCheckButton" />
+                    <div class="sample failure">
+                        Failure</div>
+                    <div class="sample success">
+                        Success</div>
+                    <span id="status"></span>
+                    <hr />
+                    <div id="area">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

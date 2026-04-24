@@ -1,0 +1,63 @@
+$Id: README,v 1.2 2008/07/22 13:00:45 masayu-a Exp $
+
+Text-ChaSen
+
+1. はじめに
+
+このモジュールは、奈良先端科学技術大学が作成した形態素解析ソフトウェア
+「茶筌」をperlから扱うためのものです。
+
+このモジュールを使うためには、ChaSen 2.0b6以降が必要です。
+
+2. インストール
+
+Text-ChaSen-{$version}.tar.gzを展開し、作成されたディレクトリ
+Text-ChaSen-{$version}に移動します。
+次にMakefile.PLを編集し、以下の内容が書かれている行を修正して、
+libchasen.aの存在するディレクトリを指定します。
+
+'LIBS' => ['-lchasen']
+
+例: /usr/local/libにlibchasen.aがある場合
+
+'LIBS' => ['-L/usr/local/lib -lchasen']
+
+Makefile.PLを編集したら、perl Makefile.PLを実行し、Makefileを生成しま
+す。その後、makeを実行してモジュールを作成し、適切なユーザ権限でmake
+installを実行すればモジュールがインストールされます。
+
+3. 使い方
+
+使い方については、perldoc Text::ChaSenを参照してください。
+
+4. 著作件表示
+
+Copyright(c) 1998, 1999 NOKUBI Takatsugu <knok@daionet.gr.jp>
+Copyright(c) 1997 Nara Institute of Science and Technorogy.
+All Rights Reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3. The name Nara Institute of Science and Technology may not be used to
+endorse or promote products derived from this software without specific
+prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY Nara Institute of Science and Technology 
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
+PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE Nara Institute
+of Science and Technology BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

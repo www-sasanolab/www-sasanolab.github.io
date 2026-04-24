@@ -1,0 +1,256 @@
+<html>
+<head>
+<title>Kmyacconv - くみゃっこんぶ</title>
+<!--あいうえお-->
+<script type="text/javascript" src="conv.js"></script>
+<script type="text/javascript" >
+<!--
+    var $ = function (id) { return document.getElementById(id); };
+
+    function main() {
+        var parserTable = ParserTable.readFromText($('input').value);
+
+        parserTable.collectTokens();
+
+	$('rules').innerHTML = parserTable.rulesToHTML();
+        $('code').value = parserTable.make();
+    }
+
+//-->
+</script>
+</head>
+<body>
+<h1>Kmyacconv - くみゃっこんぶ</h1>
+<p>
+kmyaccの出力するy.outputからEmacs Lisp用の構文解析表へと変換するモノ。
+アクション表とGOTO表は今のところごっちゃ。
+</p>
+↓ここにy.outputの中身を貼りつけて押す→
+<input type="button" onclick="main();" value="do" /><br />
+<textarea id="input" style="width: 50%; height:200px;">
+state 0
+	(0) $start : . start
+
+	ID		shift 16 and reduce (6)
+	INT		shift 17 and reduce (7)
+	STRING		shift 18 and reduce (8)
+	FN		shift 8
+	LP		shift 1
+	LET		shift 6
+	start		goto 9
+	exp		goto 19 and reduce (1)
+	appexp		goto 5
+	atexp		goto 20 and reduce (4)
+	.		error
+
+state 1
+	(9) atexp : LP . exp RP
+
+	ID		shift 16 and reduce (6)
+	INT		shift 17 and reduce (7)
+	STRING		shift 18 and reduce (8)
+	FN		shift 8
+	LP		shift 1
+	LET		shift 6
+	exp		goto 11
+	appexp		goto 5
+	atexp		goto 20 and reduce (4)
+	.		error
+
+state 2
+	(3) exp : FN ID EQARW . exp
+
+	ID		shift 16 and reduce (6)
+	INT		shift 17 and reduce (7)
+	STRING		shift 18 and reduce (8)
+	FN		shift 8
+	LP		shift 1
+	LET		shift 6
+	exp		goto 24 and reduce (3)
+	appexp		goto 5
+	atexp		goto 20 and reduce (4)
+	.		error
+
+state 3
+	(10) atexp : LET decseq IN . exp END
+
+	ID		shift 16 and reduce (6)
+	INT		shift 17 and reduce (7)
+	STRING		shift 18 and reduce (8)
+	FN		shift 8
+	LP		shift 1
+	LET		shift 6
+	exp		goto 15
+	appexp		goto 5
+	atexp		goto 20 and reduce (4)
+	.		error
+
+state 4
+	(13) dec : VAL ID EQ . exp
+
+	ID		shift 16 and reduce (6)
+	INT		shift 17 and reduce (7)
+	STRING		shift 18 and reduce (8)
+	FN		shift 8
+	LP		shift 1
+	LET		shift 6
+	exp		goto 25 and reduce (13)
+	appexp		goto 5
+	atexp		goto 20 and reduce (4)
+	.		error
+
+state 5
+	(2) exp : appexp .
+	(5) appexp : appexp . atexp
+
+	ID		shift 16 and reduce (6)
+	INT		shift 17 and reduce (7)
+	STRING		shift 18 and reduce (8)
+	LP		shift 1
+	LET		shift 6
+	atexp		goto 21 and reduce (5)
+	.		reduce (2)
+
+state 6
+	(10) atexp : LET . decseq IN exp END
+	(12) decseq : .
+
+	VAL		shift 12
+	decseq		goto 13
+	dec		goto 7
+	.		reduce (12)
+
+state 7
+	(11) decseq : dec . decseq
+	(12) decseq : .
+
+	VAL		shift 12
+	decseq		goto 23 and reduce (11)
+	dec		goto 7
+	.		reduce (12)
+
+state 8
+	(3) exp : FN . ID EQARW exp
+
+	ID		shift 10
+	.		error
+
+state 9
+	(0) $start : start .
+
+	$EOF		accept
+	.		error
+
+state 10
+	(3) exp : FN ID . EQARW exp
+
+	EQARW		shift 2
+	.		error
+
+state 11
+	(9) atexp : LP exp . RP
+
+	RP		shift 22 and reduce (9)
+	.		error
+
+state 12
+	(13) dec : VAL . ID EQ exp
+
+	ID		shift 14
+	.		error
+
+state 13
+	(10) atexp : LET decseq . IN exp END
+
+	IN		shift 3
+	.		error
+
+state 14
+	(13) dec : VAL ID . EQ exp
+
+	EQ		shift 4
+	.		error
+
+state 15
+	(10) atexp : LET decseq IN exp . END
+
+	END		shift 26 and reduce (10)
+	.		error
+
+state 16
+	(6) atexp : ID .
+
+	.		reduce (6)
+
+state 17
+	(7) atexp : INT .
+
+	.		reduce (7)
+
+state 18
+	(8) atexp : STRING .
+
+	.		reduce (8)
+
+state 19
+	(1) start : exp .
+
+	.		reduce (1)
+
+state 20
+	(4) appexp : atexp .
+
+	.		reduce (4)
+
+state 21
+	(5) appexp : appexp atexp .
+
+	.		reduce (5)
+
+state 22
+	(9) atexp : LP exp RP .
+
+	.		reduce (9)
+
+state 23
+	(11) decseq : dec decseq .
+
+	.		reduce (11)
+
+state 24
+	(3) exp : FN ID EQARW exp .
+
+	.		reduce (3)
+
+state 25
+	(13) dec : VAL ID EQ exp .
+
+	.		reduce (13)
+
+state 26
+	(10) atexp : LET decseq IN exp END .
+
+	.		reduce (10)
+
+
+Statistics for lambda2.jsy:
+	15 terminal symbols
+	7 nonterminal symbols
+	14 productions
+	27 states
+	0 shift/reduce, 0 reduce/reduce conflicts
+	38 items
+	30 lookahead sets used
+	65+28=93 action entries
+	5080 bytes used
+
+</textarea>
+<hr />
+<h2>還元規則</h2>
+<div id="rules"></div>
+<h2>Emacs Lispのソースコード</h2>
+<textarea id="code" style="width: 50%; height:400px;"></textarea>
+<div id="output" style="font-size: 20px;"></div>
+
+</body>
+</html>

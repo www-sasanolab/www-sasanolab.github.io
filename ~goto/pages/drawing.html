@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Goto - Processing.js</title>
+    <link rel="Stylesheet" href="../style.css" />
+    <script type="text/javascript" src="../js/processing.js"></script>
+    <script type="text/javascript" src="../js/prototype.js"></script>
+    <script type="text/javascript">
+
+        //-------------------------------------------------------------
+        var ball = [];
+        var circle = [];
+
+        //class
+        function Position(x, y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        //class
+        function Circle(p, r) {
+            this.position = p;
+            this.r = r;
+            this.speed = new Position(0, 0);
+            this.accel = new Position(0, 0);
+        }
+        Circle.prototype.calc = function() {
+            
+        }
+
+        window.onload = function() {
+            var p_parent = $('set-body');
+            //make a Processing.js instance
+            var p = Processing("canvasElement");
+
+
+            p.setup = function() {
+                this.size(p_parent.offsetWidth - 50, p_parent.offsetHeight);
+            };
+            p.frameRate = 30;
+
+            p.mousePressed = function() {
+                circle.push(new Circle(new Position(p.mouseX,p.mouseY),5));
+            }
+
+            p.draw = function() {
+                
+                //STEP
+                //DRAW
+                this.background(192, 192, 160);
+
+            };
+
+            //keep the canvas element the same size as the window
+            this.resize = function() {
+                p.size(window.innerWidth, window.innerHeight - 100);
+            }
+
+            //start processing.js
+            p.init();
+
+        };
+
+        window.onresize = function() {
+            this.resize();
+        }
+
+
+    </script>
+</head>
+<body>
+    <div id="container">
+        <div id="header">
+            <h1>
+                <a href="../">Goto</a> - <a href="./drawing.html">Drawing by Processing.js</a></h1>
+            <ul id="navi">
+                <li><a href="/">SIC</a></li>
+                <li><a href="/~m110057/">Top</a></li>
+            </ul>
+        </div>
+        <div id="content">
+            <div class="set">
+                <h2>
+                    Processing.js</h2>
+                <div class="set-header">
+                    created at 2010/05/17
+                </div><!--set-header-->
+                <div id="set-body" class="set-body">
+                <canvas id="canvasElement" width="100" height="100" ></canvas>
+                </div><!--set-body-->
+            </div><!--set-->
+        </div>
+    </div>
+</body>
+</html>
