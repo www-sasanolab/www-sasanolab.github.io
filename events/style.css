@@ -1,0 +1,1571 @@
+/* ==================================================
+   基本設定
+================================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family:
+    "Yu Gothic",
+    "Hiragino Kaku Gothic ProN",
+    "Meiryo",
+    sans-serif;
+
+  color: #365b61;
+
+  line-height: 1.8;
+
+  background:
+    linear-gradient(
+      180deg,
+      #fffaf5 0%,
+      #f3fbfa 50%,
+      #fffaf6 100%
+    );
+}
+
+
+
+/* ==================================================
+   TOP / HERO
+================================================== */
+
+.hero {
+  min-height: 700px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+
+  position: relative;
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 5% 10%,
+      #dff1ef 0px,
+      #dff1ef 130px,
+      transparent 131px
+    ),
+
+    radial-gradient(
+      circle at 95% 80%,
+      #f8e1d8 0px,
+      #f8e1d8 160px,
+      transparent 161px
+    ),
+
+    radial-gradient(
+      circle at 10% 80%,
+      #f9e8e1 0px,
+      #f9e8e1 90px,
+      transparent 91px
+    ),
+
+    linear-gradient(
+      135deg,
+      #fffaf4,
+      #f4fbfa,
+      #fff9f4
+    );
+}
+
+
+/* 背景の飾り */
+
+.hero::before {
+  content: "♧";
+
+  position: absolute;
+
+  top: 60px;
+  left: 8%;
+
+  font-size: 80px;
+
+  color: #91c1bd;
+
+  opacity: 0.6;
+
+  transform: rotate(-20deg);
+}
+
+
+.hero::after {
+  content: "Good Memories ♡";
+
+  position: absolute;
+
+  right: 10%;
+  top: 180px;
+
+  font-family: "Comic Sans MS", cursive;
+
+  font-size: 20px;
+
+  font-style: italic;
+
+  color: #82aaa7;
+
+  transform: rotate(-10deg);
+
+  opacity: 0.8;
+}
+
+
+
+/* HERO中央 */
+
+.hero-content {
+  width: 90%;
+
+  max-width: 850px;
+
+  position: relative;
+
+  z-index: 2;
+}
+
+
+.small-title {
+  margin-bottom: 20px;
+
+  color: #75a6a4;
+
+  font-family: Georgia, serif;
+
+  font-size: 14px;
+
+  letter-spacing: 7px;
+}
+
+
+.hero h1 {
+  color: #345860;
+
+  font-family:
+    "Yu Mincho",
+    "Hiragino Mincho ProN",
+    serif;
+
+  font-size: clamp(48px, 7vw, 75px);
+
+  font-weight: 500;
+
+  letter-spacing: 8px;
+
+  line-height: 1.35;
+}
+
+
+.hero h1 span {
+  color: #57a6a2;
+
+  font-size: 0.7em;
+
+  letter-spacing: 5px;
+}
+
+
+.date {
+  display: inline-block;
+
+  margin-top: 25px;
+
+  padding: 7px 35px;
+
+  border: 1.5px solid #75aaa7;
+
+  border-radius: 50px;
+
+  color: #579b98;
+
+  font-family: Georgia, serif;
+
+  font-size: 16px;
+
+  letter-spacing: 3px;
+}
+
+
+.hero-message {
+  margin-top: 30px;
+
+  color: #45666b;
+
+  font-size: 18px;
+
+  letter-spacing: 2px;
+
+  line-height: 2;
+}
+
+
+
+/* ==================================================
+   ABOUT
+================================================== */
+
+.section {
+  max-width: 1100px;
+
+  margin: 80px auto;
+
+  padding: 65px 70px;
+
+  background: rgba(255, 255, 255, 0.93);
+
+  border-radius: 35px;
+
+  box-shadow:
+    0 15px 50px rgba(80, 120, 115, 0.10);
+}
+
+
+
+/* ABOUTタイトル */
+
+.section-title {
+  text-align: center;
+
+  margin-bottom: 45px;
+}
+
+
+.section-title > span {
+  width: 70px;
+  height: 70px;
+
+  margin: 0 auto 15px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 50%;
+
+  background: #fde4dc;
+
+  color: #45686d;
+
+  font-family: Georgia, serif;
+
+  font-size: 25px;
+}
+
+
+.section-title h2 {
+  color: #355a61;
+
+  font-family:
+    "Yu Mincho",
+    "Hiragino Mincho ProN",
+    serif;
+
+  font-size: 33px;
+
+  font-weight: 500;
+
+  letter-spacing: 5px;
+}
+
+
+.section-title p {
+  margin-top: 5px;
+
+  color: #65a7a3;
+
+  font-size: 11px;
+
+  letter-spacing: 6px;
+}
+
+
+
+/* ABOUT本文 */
+
+.about-card {
+  display: grid;
+
+  grid-template-columns: 1fr 0.85fr;
+
+  gap: 45px;
+
+  align-items: center;
+}
+
+
+.about-text {
+  text-align: center;
+}
+
+
+.about-text h3 {
+  margin-bottom: 20px;
+
+  color: #365b61;
+
+  font-size: 20px;
+}
+
+
+.about-text > p {
+  margin-bottom: 12px;
+
+  color: #5a7377;
+
+  font-size: 14px;
+
+  line-height: 2;
+}
+
+
+
+/* 基本情報 */
+
+.info {
+  margin-top: 30px;
+
+  padding: 22px;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #e8f7f4,
+      #f3fbfa
+    );
+
+  text-align: left;
+}
+
+
+.info p {
+  margin: 8px 0;
+
+  color: #45676c;
+
+  font-size: 14px;
+}
+
+
+
+/* ABOUT写真 */
+
+.photo-placeholder {
+  width: 100%;
+  height: 330px;
+
+  position: relative;
+
+  overflow: hidden;
+
+  border-radius: 25px;
+
+  border: none;
+
+  background: #e7f1f2;
+
+  box-shadow:
+    0 10px 25px rgba(65, 100, 105, 0.12);
+
+  cursor: pointer;
+
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.photo-placeholder img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+
+ 
+  object-position: 35% 80%;
+
+ 
+  border-radius: 0;
+
+  transition:
+    transform 0.5s ease,
+    filter 0.4s ease;
+}
+
+.photo-placeholder:hover {
+  transform: translateY(-7px);
+
+  box-shadow:
+    0 18px 40px rgba(65, 100, 105, 0.22);
+}
+
+
+
+
+.photo-placeholder:hover img {
+  transform: scale(1.05);
+
+  filter: brightness(0.88);
+}
+
+
+/* =========================================
+   吹き出し
+========================================= */
+
+.photo-placeholder::after {
+  content: "みんなで記念撮影 📷";
+
+  position: absolute;
+
+  left: 50%;
+  bottom: 25px;
+
+  transform:
+    translate(-50%, 15px);
+
+  padding: 10px 22px;
+
+  background: rgba(255, 255, 255, 0.94);
+
+  color: #41666b;
+
+  border-radius: 50px;
+
+  font-size: 13px;
+
+  letter-spacing: 1px;
+
+  white-space: nowrap;
+
+  box-shadow:
+    0 7px 20px rgba(50, 80, 85, 0.18);
+
+ 
+  opacity: 0;
+
+  visibility: hidden;
+
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease,
+    visibility 0.35s ease;
+
+  pointer-events: none;
+}
+
+
+
+.photo-placeholder:hover::after {
+  opacity: 1;
+
+  visibility: visible;
+
+  transform:
+    translate(-50%, 0);
+}
+
+
+/* ==================================================
+   スマホ対応
+================================================== */
+
+@media (max-width: 600px) {
+
+  .photo-placeholder {
+    height: 260px;
+  }
+
+  .photo-placeholder::after {
+    font-size: 11px;
+
+    padding: 8px 15px;
+
+    bottom: 15px;
+  }
+
+}
+
+
+
+  
+
+
+
+/* ==================================================
+   DAY 1 / DAY 2
+================================================== */
+
+.day-section {
+  width: 100%;
+
+  padding: 80px 6%;
+
+  background:
+    linear-gradient(
+      135deg,
+      #dff3f1 0%,
+      #edf9f7 50%,
+      #e5f5f3 100%
+    );
+}
+
+
+.day-header {
+  max-width: 1250px;
+
+  margin: 0 auto 45px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.day-heading {
+  display: flex;
+
+  align-items: center;
+
+  gap: 20px;
+}
+
+
+.day-badge {
+  width: 90px;
+  height: 70px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 50%;
+
+  background: #8bbab6;
+
+  color: white;
+
+  font-family: Georgia, serif;
+
+  font-size: 15px;
+
+  letter-spacing: 2px;
+
+  box-shadow:
+    0 7px 20px rgba(70, 120, 115, 0.12);
+}
+
+
+.day-heading h2 {
+  color: #345b61;
+
+  font-family:
+    "Yu Mincho",
+    "Hiragino Mincho ProN",
+    serif;
+
+  font-size: 29px;
+
+  font-weight: 500;
+
+  letter-spacing: 5px;
+}
+
+
+.mountain {
+  color: #6fa8a5;
+
+  font-size: 25px;
+}
+
+
+.day-date {
+  color: #588487;
+
+  font-family: Georgia, serif;
+
+  font-size: 13px;
+
+  letter-spacing: 3px;
+}
+
+
+
+/* ==================================================
+   DAY スケジュール
+================================================== */
+
+.schedule-row {
+  max-width: 1250px;
+
+  margin: auto;
+
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 20px;
+}
+
+
+.schedule-time {
+  margin-bottom: 12px;
+
+  padding-bottom: 10px;
+
+  border-bottom: 1px solid #acd1cd;
+
+  color: #3f6267;
+
+  font-family: Georgia, serif;
+
+  font-size: 14px;
+
+  white-space: nowrap;
+}
+
+
+/* カード */
+
+.schedule-card {
+  min-height: 230px;
+
+  padding: 25px 22px;
+
+  background: rgba(255, 255, 255, 0.94);
+
+  border-radius: 20px;
+
+  text-align: center;
+
+  box-shadow:
+    0 10px 30px rgba(70, 110, 105, 0.08);
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+
+.schedule-card:hover {
+  transform: translateY(-7px);
+
+  box-shadow:
+    0 18px 40px rgba(70, 110, 105, 0.14);
+}
+
+
+.schedule-icon {
+  width: 52px;
+  height: 52px;
+
+  margin: 0 auto 15px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 50%;
+
+  background: #fde5dd;
+
+  font-size: 24px;
+}
+
+
+.schedule-card h3 {
+  margin-bottom: 10px;
+
+  color: #365b61;
+
+  font-size: 17px;
+}
+
+
+.schedule-card p {
+  color: #60777a;
+
+  font-size: 13px;
+
+  line-height: 1.9;
+}
+
+
+
+/* ==================================================
+   写真ギャラリー
+================================================== */
+
+.memory-section {
+  position: relative;
+
+  padding: 95px 7%;
+
+  background:
+    linear-gradient(
+      135deg,
+      #fffaf5,
+      #fdf4ee
+    );
+
+  text-align: center;
+}
+
+
+.memory-title {
+  margin-bottom: 40px;
+}
+
+
+.memory-title > span {
+  font-size: 28px;
+}
+
+
+.memory-title h2 {
+  margin-top: 5px;
+
+  color: #355a61;
+
+  font-family:
+    "Yu Mincho",
+    "Hiragino Mincho ProN",
+    serif;
+
+  font-size: 31px;
+
+  font-weight: 500;
+
+  letter-spacing: 5px;
+}
+
+
+.memory-title p {
+  margin-top: 4px;
+
+  color: #6ba8a5;
+
+  font-size: 11px;
+
+  letter-spacing: 6px;
+}
+
+
+
+/* 写真 */
+
+.memory-gallery {
+  max-width: 1100px;
+
+  margin: auto;
+
+  display: grid;
+
+  grid-template-columns: 1.4fr 1fr 1fr;
+
+  gap: 20px;
+}
+
+
+.memory-photo {
+  height: 270px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #dce9ef,
+      #edf4f6
+    );
+
+  color: #7899a1;
+
+  overflow: hidden;
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+
+.memory-photo:hover {
+  transform: translateY(-5px);
+
+  box-shadow:
+    0 12px 30px rgba(80, 110, 120, 0.12);
+}
+
+
+.memory-photo .photo-icon {
+  margin-bottom: 5px;
+
+  color: #9bb5bb;
+
+  font-size: 40px;
+}
+
+
+.memory-photo > span {
+  font-family: Georgia, serif;
+
+  font-size: 13px;
+
+  letter-spacing: 4px;
+}
+
+
+.memory-photo > p {
+  margin-top: 8px;
+
+  font-size: 13px;
+}
+
+
+
+/* 手書き風 */
+
+.handwriting {
+  position: absolute;
+
+  font-family:
+    "Comic Sans MS",
+    cursive;
+
+  font-style: italic;
+
+  color: #db9a88;
+
+  font-size: 17px;
+
+  line-height: 1.5;
+}
+
+
+.left-writing {
+  left: 10%;
+
+  top: 50%;
+
+  transform: rotate(-10deg);
+}
+
+
+/* ギャラリーの写真 */
+.memory-photo {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.memory-photo img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: center center;
+
+  display: block;
+
+  transition: transform 0.5s ease,
+              filter 0.4s ease;
+}
+
+
+/* カーソルを合わせると拡大 */
+.memory-photo:hover img {
+  transform: scale(1.07);
+  filter: brightness(0.85);
+}
+
+
+/* 写真に出す文字 */
+.memory-photo::after {
+ 
+
+  position: absolute;
+
+  left: 50%;
+  bottom: 20px;
+
+  transform: translate(-50%, 15px);
+
+  padding: 8px 20px;
+
+  background: rgba(255, 255, 255, 0.93);
+
+  color: #41666b;
+
+  border-radius: 30px;
+
+  font-size: 13px;
+
+  white-space: nowrap;
+
+  opacity: 0;
+  visibility: hidden;
+
+  transition: 0.35s ease;
+}
+
+.s2::after {
+  content: "ご飯食べました！🍴";
+}
+
+.s3::after {
+  content: "足湯しました！ ♨️";
+}
+
+.s4::after {
+  content: "ホテルの内装！☂️";
+}
+
+
+
+/* カーソルを合わせたら文字を表示 */
+.memory-photo:hover::after {
+  opacity: 1;
+  visibility: visible;
+
+  transform: translate(-50%, 0);
+}
+
+
+
+/* ==================================================
+   ENDING
+================================================== */
+
+.ending {
+  padding: 120px 30px;
+
+  text-align: center;
+
+  background:
+    radial-gradient(
+      circle at 10% 50%,
+      #dff1ef 0,
+      transparent 28%
+    ),
+
+    radial-gradient(
+      circle at 90% 50%,
+      #f7e1d9 0,
+      transparent 28%
+    ),
+
+    linear-gradient(
+      135deg,
+      #fffaf5,
+      #f7fbf9
+    );
+}
+
+
+.ending-small {
+  margin-bottom: 20px;
+
+  color: #72a5a2;
+
+  font-size: 11px;
+
+  letter-spacing: 6px;
+}
+
+
+.ending h2 {
+  margin-bottom: 20px;
+
+  color: #355b61;
+
+  font-family:
+    "Yu Mincho",
+    "Hiragino Mincho ProN",
+    serif;
+
+  font-size: 38px;
+
+  font-weight: 500;
+
+  letter-spacing: 5px;
+
+  line-height: 1.7;
+}
+
+
+.ending > p:not(.ending-small) {
+  color: #61777a;
+
+  font-size: 14px;
+
+  line-height: 2;
+}
+
+
+.ending-mark {
+  display: inline-block;
+
+  margin-top: 30px;
+
+  padding: 7px 35px;
+
+  border: 1px solid #79aaa7;
+
+  border-radius: 50px;
+
+  color: #609995;
+
+  font-family: Georgia, serif;
+
+  letter-spacing: 2px;
+}
+
+
+
+/* ==================================================
+   FOOTER
+================================================== */
+
+footer {
+  padding: 30px;
+
+  background: #72aaa6;
+
+  text-align: center;
+
+  color: white;
+
+  font-family: Georgia, serif;
+
+  font-size: 12px;
+
+  letter-spacing: 4px;
+}
+
+
+
+/* ==================================================
+   タブレット
+================================================== */
+
+@media (max-width: 950px) {
+
+  .section {
+    width: calc(100% - 40px);
+
+    padding: 50px 35px;
+  }
+
+
+  .about-card {
+    grid-template-columns: 1fr;
+  }
+
+
+  .photo-placeholder {
+    min-height: 280px;
+  }
+
+
+  .schedule-row {
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 30px 20px;
+  }
+
+
+  .memory-gallery {
+    grid-template-columns: 1fr 1fr;
+  }
+
+
+  .big-photo {
+    grid-column: 1 / -1;
+  }
+
+
+  .handwriting {
+    display: none;
+  }
+
+}
+
+
+
+
+/* ==================================================
+   スマホ
+================================================== */
+
+@media (max-width: 600px) {
+
+  .hero {
+    min-height: 650px;
+
+    padding: 40px 20px;
+  }
+
+
+  .hero::before,
+  .hero::after {
+    display: none;
+  }
+
+
+  .small-title {
+    font-size: 10px;
+
+    letter-spacing: 4px;
+  }
+
+
+  .hero h1 {
+    font-size: 43px;
+
+    letter-spacing: 4px;
+  }
+
+
+  .hero h1 span {
+    font-size: 30px;
+  }
+
+
+  .hero-message {
+    font-size: 15px;
+  }
+
+
+  .section {
+    margin: 40px auto;
+
+    padding: 40px 20px;
+
+    border-radius: 25px;
+  }
+
+
+  .section-title h2 {
+    font-size: 25px;
+
+    letter-spacing: 3px;
+  }
+
+
+  .about-text > p {
+    font-size: 13px;
+  }
+
+
+  .day-section {
+    padding: 65px 20px;
+  }
+
+
+  .day-header {
+    flex-direction: column;
+
+    justify-content: center;
+
+    gap: 15px;
+
+    text-align: center;
+  }
+
+
+  .day-heading {
+    flex-direction: column;
+
+    gap: 10px;
+  }
+
+
+  .day-heading h2 {
+    font-size: 25px;
+  }
+
+
+  .mountain {
+    display: none;
+  }
+
+
+  .schedule-row {
+    grid-template-columns: 1fr;
+  }
+
+
+  .schedule-card {
+    min-height: 200px;
+  }
+
+
+  .memory-section {
+    padding: 70px 20px;
+  }
+
+
+  .memory-gallery {
+    grid-template-columns: 1fr;
+  }
+
+
+  .big-photo {
+    grid-column: auto;
+  }
+
+
+  .memory-photo {
+    height: 270px;
+  }
+
+
+  .ending {
+    padding: 90px 20px;
+  }
+
+
+  .ending h2 {
+    font-size: 27px;
+
+    letter-spacing: 3px;
+  }
+
+
+  .ending > p br {
+    display: none;
+  }
+
+}
+
+.photo-placeholder img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  border-radius: 25px;
+}
+
+/* =========================================
+   PC画面のフォトギャラリー 最終調整
+========================================= */
+@media screen and (min-width: 951px) {
+
+  .memory-gallery {
+    max-width: 1100px;
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 20px;
+  }
+
+  .memory-photo,
+  .memory-photo.big-photo {
+    width: 100%;
+    height: 380px;
+
+    grid-column: auto;
+
+    border-radius: 22px;
+    overflow: hidden;
+  }
+
+  .memory-photo img,
+  .memory-photo.big-photo img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover !important;
+    object-position: center !important;
+
+    display: block;
+  }
+}
+
+
+
+/* 縦1列になったときだけ、写真の縦を長くする */
+@media screen and (max-width: 950px) {
+
+  .memory-photo,
+  .memory-photo.big-photo {
+    height: 550px;
+  }
+
+}
+
+.ending-mark {
+  text-decoration: none;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.ending-mark:hover {
+  background: #79aaa7;
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(80, 120, 115, 0.18);
+}
+
+/* =========================================
+   ARCHIVE MENU
+========================================= */
+
+.archive-menu {
+  position: fixed;
+  top: 30px;
+  right: 35px;
+
+  z-index: 1000;
+}
+
+
+/* チェックボックスは隠す */
+#archive-toggle {
+  display: none;
+}
+
+
+/* ARCHIVEボタン */
+.archive-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 20px;
+
+  background: rgba(255, 255, 255, 0.9);
+
+  border: 1px solid #8ebbb8;
+  border-radius: 30px;
+
+  color: #568c89;
+
+  font-family: Georgia, serif;
+  font-size: 12px;
+
+  letter-spacing: 2px;
+
+  cursor: pointer;
+
+  box-shadow: 0 5px 20px rgba(70, 110, 105, 0.1);
+
+  transition: 0.3s ease;
+}
+
+
+/* カーソルを合わせたとき */
+.archive-button:hover {
+  background: #8ebbb8;
+  color: white;
+
+  transform: translateY(-2px);
+}
+
+
+/* ＋ */
+.archive-button span {
+  font-size: 17px;
+
+  transition: transform 0.3s ease;
+}
+
+
+/* ================================
+   開く部分
+================================ */
+
+.archive-panel {
+  position: absolute;
+
+  top: 55px;
+  right: 0;
+
+  width: 190px;
+
+  padding: 25px;
+
+  background: rgba(255, 255, 255, 0.97);
+
+  border-radius: 20px;
+
+  box-shadow: 0 15px 40px rgba(70, 100, 105, 0.15);
+
+  /* 最初は非表示 */
+  opacity: 0;
+  visibility: hidden;
+
+  transform: translateY(-10px);
+
+  transition: 0.35s ease;
+}
+
+
+/* 開いたとき */
+#archive-toggle:checked ~ .archive-panel {
+  opacity: 1;
+  visibility: visible;
+
+  transform: translateY(0);
+}
+
+
+/* ＋を回転 */
+#archive-toggle:checked + .archive-button span {
+  transform: rotate(45deg);
+}
+
+
+/* タイトル */
+.archive-title {
+  margin-bottom: 15px;
+
+  color: #6aa5a1;
+
+  font-family: Georgia, serif;
+  font-size: 10px;
+
+  letter-spacing: 3px;
+}
+
+
+/* 年 */
+.archive-panel a {
+  display: block;
+
+  padding: 8px 5px;
+
+  color: #45696d;
+
+  font-family: Georgia, serif;
+  font-size: 15px;
+
+  text-decoration: none;
+
+  border-bottom: 1px solid #e2efed;
+
+  transition: 0.25s ease;
+}
+
+
+/* 年にカーソルを合わせたとき */
+.archive-panel a:hover {
+  color: #db907e;
+
+  padding-left: 12px;
+}
+
+
+/* 下の手書き風文字 */
+.archive-note {
+  margin-top: 18px;
+
+  color: #db9a88;
+
+  font-family: "Comic Sans MS", cursive;
+  font-size: 12px;
+
+  font-style: italic;
+}
+
+
+/* スマホ */
+@media screen and (max-width: 600px) {
+
+  .archive-menu {
+    top: 15px;
+    right: 15px;
+  }
+
+  .archive-button {
+    padding: 8px 14px;
+    font-size: 10px;
+  }
+
+  .archive-panel {
+    width: 170px;
+  }
+
+}
+
+/* =========================================
+   スクロールでふわっと表示
+========================================= */
+
+.fade-up {
+  opacity: 0;
+  transform: translateY(50px);
+
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
+}
+
+
+/* 画面に入ったらこの状態になる */
+.fade-up.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.omikuji-area {
+  text-align: center;
+  margin: 70px 0;
+}
+
+.omikuji-button {
+  padding: 13px 35px;
+  border: 1px solid #85b8b4;
+  border-radius: 50px;
+
+  background: white;
+  color: #609995;
+
+  font-family: "Yu Mincho", serif;
+  font-size: 15px;
+  letter-spacing: 2px;
+
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.omikuji-button:hover {
+  background: #85b8b4;
+  color: white;
+  transform: translateY(-3px);
+}
+
+#omikuji-result:not(:empty) {
+  max-width: 450px;
+  margin: 30px auto 0;
+  padding: 25px;
+
+  background: white;
+  border-radius: 20px;
+
+  box-shadow: 0 10px 30px rgba(80, 120, 115, 0.12);
+}
